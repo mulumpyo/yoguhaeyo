@@ -10,14 +10,7 @@
 
 ## 🛠️ 기술 스택 
 
-![skill](https://skillicons.dev/icons?i=remix&theme=light)
-![skill](https://skillicons.dev/icons?i=react&theme=light)
-![skill](https://skills.syvixor.com/api/icons?i=fastify)
-![skill](https://skills-icons.vercel.app/api/icons?i=mariadb)
-![skill](https://skills.syvixor.com/api/icons?i=swagger)
-![skill](https://skills.syvixor.com/api/icons?i=oci)
-![skill](https://skillicons.dev/icons?i=ubuntu&theme=light)
-![skill](https://skillicons.dev/icons?i=githubactions&theme=light)
+[![stackticon](https://firebasestorage.googleapis.com/v0/b/stackticon-81399.appspot.com/o/images%2F1762813938166?alt=media&token=e0d7ec3e-667f-47b9-bbf3-63b2e889927f)](https://github.com/msdio/stackticon)
 <br /><br />
 
 ## 🗂 산출물
