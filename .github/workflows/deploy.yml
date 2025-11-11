@@ -27,7 +27,7 @@ jobs:
       - name: 빌드
         run: pnpm build
 
-      - name: 배포
+      - name: Oracle Cloud 서버 배포
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
@@ -37,15 +37,41 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > key.pem
           chmod 600 key.pem
 
+          echo "📦 서버에 코드 전송 중..."
           ssh -i key.pem -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "mkdir -p $SERVER_PATH"
-          rsync -avz --exclude 'client' --exclude '.git' --exclude 'node_modules' -e "ssh -i key.pem -o StrictHostKeyChecking=no" ./ $SERVER_USER@$SERVER_HOST:$SERVER_PATH
+          rsync -avz \
+            --exclude '.git' \
+            --exclude 'node_modules' \
+            --exclude 'client' \
+            -e "ssh -i key.pem -o StrictHostKeyChecking=no" ./ $SERVER_USER@$SERVER_HOST:$SERVER_PATH
 
+          echo "🚀 서버에서 빌드/재시작 중..."
           ssh -i key.pem -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'ENDSSH'
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
             cd $SERVER_PATH
             export NODE_ENV=production
+
+            # pnpm / pm2 자동 설치 (없을 경우)
+            if ! command -v pnpm &> /dev/null; then
+              echo "🔧 pnpm 설치 중..."
+              npm install -g pnpm
+            fi
+
+            if ! command -v pm2 &> /dev/null; then
+              echo "🔧 pm2 설치 중..."
+              npm install -g pm2
+            fi
+
+            echo "📦 의존성 설치 중..."
             pnpm install --prod
+
+            echo "♻️ 앱 재시작 중..."
             pm2 restart app || pm2 start server/index.js --name app --update-env
             pm2 save
+
+            echo "✅ 배포 완료!"
           ENDSSH
 
           rm key.pem
