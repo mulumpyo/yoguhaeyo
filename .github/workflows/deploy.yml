@@ -1,0 +1,51 @@
+name: Oracle Cloud 배포
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v3
+
+      - name: Node.js (24) 설치
+        uses: actions/setup-node@v3
+        with:
+          node-version: 24
+
+      - name: pnpm 설치
+        run: npm install -g pnpm
+
+      - name: 의존성 설치
+        run: pnpm install
+
+      - name: 빌드
+        run: pnpm build
+
+      - name: 배포
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PATH: ${{ secrets.SERVER_PATH }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > key.pem
+          chmod 600 key.pem
+
+          ssh -i key.pem -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "mkdir -p $SERVER_PATH"
+          rsync -avz --exclude 'client' --exclude '.git' --exclude 'node_modules' -e "ssh -i key.pem -o StrictHostKeyChecking=no" ./ $SERVER_USER@$SERVER_HOST:$SERVER_PATH
+
+          ssh -i key.pem -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'ENDSSH'
+            cd $SERVER_PATH
+            export NODE_ENV=production
+            pnpm install --prod
+            pm2 restart app || pm2 start server/index.js --name app --update-env
+            pm2 save
+          ENDSSH
+
+          rm key.pem
