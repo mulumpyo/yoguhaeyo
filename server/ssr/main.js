@@ -8,7 +8,7 @@ export const renderMainPage = () => {
       </head>
       <body>
         <div id="root">
-          <h1>🚀 메인 페이지</h1>
+          <h1>🚀 여기가 메인 페이지</h1>
         </div>
       </body>
     </html>
