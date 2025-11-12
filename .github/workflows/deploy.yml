@@ -79,8 +79,9 @@ jobs:
               mv .env.backup .env
             fi
 
-            echo "♻️ 앱 리로드..."
-            pm2 reload yoguhaeyo --update-env
+            echo "♻️ 배포 중..."
+            pm2 stop yoguhaeyo || true
+            pm2 start server/index.js --name yoguhaeyo --update-env --instances 1 --max-memory-restart 200M
             pm2 save
 
             echo "✅ 배포 완료!"
