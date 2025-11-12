@@ -1,11 +1,11 @@
 import { pool } from "../utils/db.js";
 
 const testRoutes = async (app) => {
-  app.get("/", {
+  app.get("", {
     schema: {
       tags: ["테스트"],
-      summary: "테스트",
-      description: "테스트를 위해서 DB 서버의 현재 시간을 응답합니다.",
+      summary: "DB 연결 테스트",
+      description: "DB 서버의 시간을 응답합니다.",
       response: {
         200: {
           type: "object",

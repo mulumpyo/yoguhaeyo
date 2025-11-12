@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: 코드 체크아웃
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Node.js (24) 설치
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 24
 
@@ -27,6 +27,24 @@ jobs:
       - name: 빌드
         run: pnpm build
 
+      - name: 빌드 파일 압축
+        run: |
+          mkdir -p deploy
+          cp -r .next package.json pnpm-lock.yaml server public deploy/
+
+          rm -rf \
+            deploy/public/pages \
+            deploy/.next/cache \
+            deploy/.next/server/dev \
+            deploy/node_modules \
+            deploy/.git \
+            deploy/.github
+
+          cd deploy
+          tar -czf ../build.tar.gz .
+          cd ..
+          echo "📦 빌드 압축 완료 ($(du -h build.tar.gz | cut -f1))"
+
       - name: Oracle Cloud 서버 배포
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
@@ -36,24 +54,32 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > key.pem
           chmod 600 key.pem
 
-          echo "📦 서버에 코드 전송 중..."
-          ssh -i key.pem -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "mkdir -p ~/yoguhaeyo"
-          rsync -avz \
-            --exclude '.git' \
-            --exclude 'node_modules' \
-            --exclude '.github' \
-            -e "ssh -i key.pem -o StrictHostKeyChecking=no" ./ $SERVER_USER@$SERVER_HOST:~/yoguhaeyo
+          echo "📦 서버에 파일 전송 중..."
+          scp -i key.pem -o StrictHostKeyChecking=no build.tar.gz $SERVER_USER@$SERVER_HOST:~/yoguhaeyo.tar.gz
 
-          echo "🚀 서버에서 빌드 및 실행 중..."
+          echo "🚀 서버 배포 및 실행 중..."
           ssh -i key.pem -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'ENDSSH'
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             export PATH="$HOME/.local/share/pnpm:$PATH"
+
+            echo "🧹 기존 디렉토리 정리..."
+            if [ -f ~/yoguhaeyo/.env ]; then
+              echo "📁 .env 백업..."
+              cp ~/yoguhaeyo/.env ~/yoguhaeyo.env.backup
+            fi
+
+            rm -rf ~/yoguhaeyo && mkdir -p ~/yoguhaeyo
+
+            echo "📦 압축 해제..."
+            tar -xzf ~/yoguhaeyo.tar.gz -C ~/yoguhaeyo
+
+            if [ -f ~/yoguhaeyo.env.backup ]; then
+              echo "🔁 .env 복원..."
+              mv ~/yoguhaeyo.env.backup ~/yoguhaeyo/.env
+            fi
 
             cd ~/yoguhaeyo
             export NODE_ENV=production
 
-            # pnpm / pm2 없으면 설치
             if ! command -v pnpm &> /dev/null; then
               echo "🔧 pnpm 설치 중..."
               curl -fsSL https://get.pnpm.io/install.sh | sh -
