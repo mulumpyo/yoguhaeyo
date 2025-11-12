@@ -2,7 +2,8 @@ name: Oracle Cloud 배포
 
 on:
   push:
-    branches: [main]
+    branches: 
+      - main
 
 jobs:
   deploy:
@@ -12,7 +13,7 @@ jobs:
       - name: 코드 체크아웃
         uses: actions/checkout@v4
 
-      - name: Node.js (24) 설치
+      - name: Node.js 설치
         uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -26,7 +27,7 @@ jobs:
       - name: 빌드
         run: pnpm build
 
-      - name: Oracle Cloud 서버 배포
+      - name: 서버 배포 (rsync)
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
@@ -35,8 +36,8 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > key.pem
           chmod 600 key.pem
 
-          echo "📦 서버에 파일 동기화 중..."
-          rsync -avz \
+          echo "📦 서버에 파일 동기화 중 (rsync)..."
+          rsync -a --progress \
             --exclude '.git' \
             --exclude '.github' \
             --exclude 'node_modules' \
@@ -48,10 +49,17 @@ jobs:
 
           echo "🚀 서버 실행 중..."
           ssh -i key.pem -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'ENDSSH'
-            export PATH="$HOME/.local/share/pnpm:$PATH"
+            # NVM 및 Node 경로 로드
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            export PATH="$HOME/.local/share/pnpm:$PATH:$NVM_DIR/versions/node/$(nvm version)/bin"
 
             cd ~/yoguhaeyo
             export NODE_ENV=production
+
+            if [ -f .env ]; then
+              cp .env .env.backup
+            fi
 
             if ! command -v pnpm &> /dev/null; then
               echo "🔧 pnpm 설치 중..."
@@ -67,9 +75,12 @@ jobs:
             echo "📦 의존성 설치 중..."
             pnpm install --prod
 
-            echo "♻️ 앱 재시작..."
-            pm2 stop yoguhaeyo || true
-            pm2 start server/index.js --name yoguhaeyo --update-env
+            if [ -f .env.backup ]; then
+              mv .env.backup .env
+            fi
+
+            echo "♻️ 앱 리로드..."
+            pm2 reload yoguhaeyo --update-env
             pm2 save
 
             echo "✅ 배포 완료!"
