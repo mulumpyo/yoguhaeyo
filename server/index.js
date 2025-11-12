@@ -8,6 +8,8 @@ import { fileURLToPath } from "url";
 import fs from "fs";
 import fastifySwagger from "@fastify/swagger";
 import ScalarApiReference from "@scalar/fastify-api-reference";
+import fastifyCompress from "@fastify/compress";
+import fastifyHelmet from "@fastify/helmet";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,28 +33,23 @@ const app = fastify({
           },
         },
       }
-    : true,
+    : { level: "warn" },
 });
 
 // 서버 생성
 const createServer = async () => {
   let viteServer;
 
-  if (!isProd) {
+  await app.register(fastifyCompress, { global: true });
+  await app.register(fastifyHelmet, {
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: false,
+  });
 
+  if (!isProd) {
     // 개발 환경
 
-    // Vite
-    const vite = await import("vite");
-    viteServer = await vite.createServer({
-      root: path.resolve(__dirname, "../client"),
-      server: { middlewareMode: "ssr" },
-      appType: "custom",
-    });
-    await app.register(middie);
-    app.use(viteServer.middlewares);
-
-    // Swagger 등록
+    // Swagger
     await app.register(fastifySwagger, {
       openapi: {
         info: {
@@ -69,17 +66,21 @@ const createServer = async () => {
 
       const prefixedPaths = {};
       for (const path in swaggerObject.paths) {
-        if (path === "/" || path.startsWith("/app") || path === "/openapi.json") continue;
+        if (
+          path === "/" ||
+          path.startsWith("/app") ||
+          path === "/openapi.json"
+        )
+          continue;
 
         prefixedPaths[path] = swaggerObject.paths[path];
       }
 
       swaggerObject.paths = prefixedPaths;
-
       reply.send(swaggerObject);
     });
 
-    // Scalar UI 등록
+    // Scalar UI
     await app.register(ScalarApiReference, {
       routePrefix: "/docs",
       configuration: {
@@ -87,6 +88,17 @@ const createServer = async () => {
         layout: "modern",
       },
     });
+    
+    // Vite
+    const vite = await import("vite");
+    viteServer = await vite.createServer({
+      root: path.resolve(__dirname, "../client"),
+      server: { middlewareMode: "ssr" },
+      appType: "custom",
+    });
+    await app.register(middie);
+    app.use(viteServer.middlewares);
+    
   } else {
 
     // 배포 환경
@@ -94,6 +106,8 @@ const createServer = async () => {
     await app.register(fastifyStatic, {
       root: path.join(__dirname, "./public"),
       prefix: "/",
+      cacheControl: true,
+      maxAge: "1d",
     });
   }
 
@@ -145,8 +159,7 @@ const createServer = async () => {
   }
 
   // 서버 시작
-  await app.listen({ port });
-  app.log.info(`Server running at http://localhost:${port}`);
+  await app.listen({ port, host: "0.0.0.0" });
 };
 
 // 서버 구동
