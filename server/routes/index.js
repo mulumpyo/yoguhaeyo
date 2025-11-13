@@ -1,4 +1,4 @@
-import statusRoutes from "./status/status.routes.js";
+import statusRoutes from "./status/status.route.js";
 
 // API 라우트 등록
 const routes = async (app, opts) => {
