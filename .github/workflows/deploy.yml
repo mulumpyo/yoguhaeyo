@@ -59,6 +59,7 @@ jobs:
 
             cd ~/yoguhaeyo
             export NODE_ENV=production
+            export NEXT_PUBLIC_API_URL=https://yoguhaeyo.mulumpyo.com
 
             if [ -f .env ]; then
               cp .env .env.backup
