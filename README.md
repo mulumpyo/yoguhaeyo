@@ -10,7 +10,7 @@
 
 ## 🛠️ 기술 스택 
 
-![stackticon](https://firebasestorage.googleapis.com/v0/b/stackticon-81399.appspot.com/o/images%2F1763027728963?alt=media&token=484e28ce-50ad-4ca8-8a7f-3a34ecc1ac07)
+![stackticon](https://firebasestorage.googleapis.com/v0/b/stackticon-81399.appspot.com/o/images%2F1763072380058?alt=media&token=226a5169-90ed-4d92-8c76-ae48e0c620ee)
 <br /><br />
 
 ## 🗂 산출물

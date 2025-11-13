@@ -8,6 +8,7 @@ import fastifyCompress from "@fastify/compress";
 import fastifyHelmet from "@fastify/helmet";
 import next from "next";
 import { dbConnection } from "./utils/db.js";
+import { redisConnection } from "./utils/redis.js";
 import routes from "./routes/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -32,15 +33,6 @@ const createServer = async () => {
   // 공통 플러그인
   await app.register(fastifyCompress, { global: true });
   await app.register(fastifyHelmet, { contentSecurityPolicy: false, crossOriginResourcePolicy: false });
-
-  // DB 연결
-  try {
-    await dbConnection();
-    app.log.info("DB connection successful");
-  } catch (err) {
-    app.log.error("DB connection failed:", err.message);
-    process.exit(1);
-  }
 
   // Swagger & Scalar
   if (!isProd) {
@@ -101,8 +93,27 @@ const createServer = async () => {
 
   // API
   await app.register(routes, { prefix: "/api" });
+
+  // DB 연결
+  try {
+    await dbConnection();
+    app.log.info("DB connection successful");
+  } catch (err) {
+    app.log.error("DB connection failed:", err.message);
+    process.exit(1);
+  }
+
+  // Redis 연결
+  try {
+    await redisConnection();
+    app.log.info("Redis connection successful");
+  } catch (err) {
+    app.log.error("Redis connection failed:", err.message);
+    process.exit(1);
+  }
   
   await app.listen({ port, host: "0.0.0.0" });
+  console.log(`Server listening on port ${port} (${isProd ? "production" : "development"})`);
   app.log.info(`Server listening on port ${port} (${isProd ? "production" : "development"})`);
 };
 
