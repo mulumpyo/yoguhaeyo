@@ -1,4 +1,4 @@
-import { statusController } from "../controllers/status.controller.js";
+import { statusController } from "./status.controller.js";
 // import { verifyToken } from "../middlewares/auth.js";
 
 // Route 공통

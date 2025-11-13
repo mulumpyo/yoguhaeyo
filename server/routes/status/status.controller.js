@@ -1,4 +1,4 @@
-import { statusService } from "../services/status.service.js";
+import { statusService } from "../../services/status.service.js";
 
 export const statusController = {
   
