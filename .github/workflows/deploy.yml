@@ -24,11 +24,10 @@ jobs:
       - name: 의존성 설치
         run: pnpm install
 
-      - name: 빌드
+      - name: Next.js 빌드
         run: pnpm build
         env:
           NEXT_PUBLIC_API_URL: https://yoguhaeyo.mulumpyo.com
-
 
       - name: 서버 배포 (rsync)
         env:
@@ -45,14 +44,12 @@ jobs:
             --exclude '.github' \
             --exclude 'node_modules' \
             --exclude '.next/cache' \
-            --exclude '.next/server/dev' \
-            --exclude 'app' \
+            --exclude 'logs' \
             -e "ssh -i key.pem -o StrictHostKeyChecking=no" \
             ./ $SERVER_USER@$SERVER_HOST:~/yoguhaeyo
 
           echo "🚀 서버 실행 중..."
           ssh -i key.pem -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'ENDSSH'
-            # NVM 및 Node 경로 로드
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             export PATH="$HOME/.local/share/pnpm:$PATH:$NVM_DIR/versions/node/$(nvm version)/bin"
@@ -60,10 +57,6 @@ jobs:
             cd ~/yoguhaeyo
             export NODE_ENV=production
             export NEXT_PUBLIC_API_URL=https://yoguhaeyo.mulumpyo.com
-
-            if [ -f .env ]; then
-              cp .env .env.backup
-            fi
 
             if ! command -v pnpm &> /dev/null; then
               echo "🔧 pnpm 설치 중..."
@@ -77,17 +70,12 @@ jobs:
             fi
 
             echo "📦 의존성 설치 중..."
-            pnpm install --prod
+            pnpm install --prod --frozen-lockfile
 
-            if [ -f .env.backup ]; then
-              mv .env.backup .env
-            fi
-
-            echo "♻️ 배포 중..."
+            echo "♻️ 서버 재시작..."
             pm2 stop yoguhaeyo || true
             pm2 start server/index.js --name yoguhaeyo --update-env --instances 1 --max-memory-restart 200M
             pm2 save
-
             echo "✅ 배포 완료!"
           ENDSSH
 
