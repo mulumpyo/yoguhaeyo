@@ -76,13 +76,13 @@ const createServer = async () => {
   }
 
   // Next.js 설정
-  const nextApp = next({ dev: !isProd, dir: path.join(__dirname, "..", "public") });
+  const nextApp = next({ dev: !isProd, dir: path.join(__dirname, "..") });
   const handle = nextApp.getRequestHandler();
   await nextApp.prepare();
 
   if (isProd) {
     await app.register(fastifyStatic, {
-      root: path.join(__dirname, "..", "public/.next"),
+      root: path.join(__dirname, "..", ".next"),
       prefix: "/_next/",
       decorateReply: false,
       maxAge: "1d",

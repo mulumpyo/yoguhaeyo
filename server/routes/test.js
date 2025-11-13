@@ -1,7 +1,9 @@
 import { pool } from "../utils/db.js";
+// import { verifyToken } from "../middlewares/auth.js";
 
 const testRoutes = async (app) => {
   app.get("", {
+    // preHandler: verifyToken,
     schema: {
       tags: ["테스트"],
       summary: "DB 연결 테스트",
