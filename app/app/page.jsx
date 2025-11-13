@@ -11,10 +11,10 @@ const ClientPage = () => {
   useEffect(() => {
     const fetchServerTime = async () => {
       try {
-        const res = await axios.get("/api/test");
-        setServerTime(res.data.serverTime);
+        const { status, data } = await axios.get("/api/status/db");
+        if (status === 200) setServerTime(data.serverTime);
       } catch (err) {
-        console.error("Failed to fetch server time:", err);
+        setServerTime("Error");
       }
     };
 

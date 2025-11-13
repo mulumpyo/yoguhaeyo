@@ -67,7 +67,7 @@ const createServer = async () => {
     });
   }
 
-  // Next.js 설정
+  // Next.js
   const nextApp = next({ dev: !isProd, dir: path.join(__dirname, "..") });
   const handle = nextApp.getRequestHandler();
   await nextApp.prepare();
@@ -94,7 +94,7 @@ const createServer = async () => {
   // API
   await app.register(routes, { prefix: "/api" });
 
-  // DB 연결
+  // DB
   try {
     await dbConnection();
     app.log.info("DB connection successful");
@@ -103,7 +103,7 @@ const createServer = async () => {
     process.exit(1);
   }
 
-  // Redis 연결
+  // Redis
   try {
     await redisConnection();
     app.log.info("Redis connection successful");

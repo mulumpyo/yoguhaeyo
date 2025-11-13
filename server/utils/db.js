@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
+// DB 연결
 export const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -19,6 +20,13 @@ export const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+/**
+ * DB 연결 상태를 확인
+ * @async
+ * @function
+ * @returns {Promise<boolean>} 정상적으로 작동하면 `true`를 반환, 실패 시 에러 발생
+ * @throws {Error} DB 쿼리 실패 시
+ */
 export const dbConnection = async () => {
   try {
     const [rows] = await pool.query("SELECT 1 AS test");

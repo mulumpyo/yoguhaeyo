@@ -1,24 +1,24 @@
-import { testController } from "../controllers/test.controller.js";
+import { statusController } from "../controllers/status.controller.js";
 // import { verifyToken } from "../middlewares/auth.js";
 
 // Route 공통
 const createRouteOptions = ({ summary, description, response }) => ({
   // preHandler: verifyToken,
   schema: {
-    tags: ["테스트"],
+    tags: ["상태"],
     summary,
     description,
     response,
   },
 });
 
-const testRoutes = async (app) => {
+const statusRoutes = async (app) => {
 
-  // DB Test
+  // MariaDB
   app.get(
     "/db",
     createRouteOptions({
-      summary: "DB 연결 테스트",
+      summary: "DB 연결 상태",
       description: "DB 서버의 시간을 응답합니다.",
       response: {
         200: {
@@ -29,14 +29,14 @@ const testRoutes = async (app) => {
         },
       },
     }),
-    testController.getDbTime
+    statusController.getDbTime
   );
 
-  // Redis Test
+  // Redis
   app.get(
     "/redis",
     createRouteOptions({
-      summary: "Redis 연결 테스트",
+      summary: "Redis 연결 상태",
       description: "Redis PING 응답을 반환합니다.",
       response: {
         200: {
@@ -47,9 +47,9 @@ const testRoutes = async (app) => {
         },
       },
     }),
-    testController.getRedisPing
+    statusController.getRedisPing
   );
 
 };
 
-export default testRoutes;
+export default statusRoutes;
