@@ -9,7 +9,7 @@ export const statusService = {
    * @returns {Promise<string>} DB 서버 한국 기준 시간 문자열( format: YYYY-MM-DD HH:mm:SS )
    * @throws {Error} DB 조회 실패 시
    */
-  async getDbTime() {
+  getDbTime: async () => {
     const rawTime = await statusMapper.selectDbTime();
     return formatKST(rawTime);
   },
@@ -19,8 +19,8 @@ export const statusService = {
    * @returns {Promise<string>} Redis 서버가 정상일 경우 "PONG"
    * @throws {Error} Redis 연결 실패 시
    */
-  async getRedisPing() {
+  getRedisPing: async () => {
     return await redis.ping();
   },
-  
-};  
+
+};
