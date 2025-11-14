@@ -63,6 +63,7 @@ const createServer = async () => {
       configuration: {
         spec: { url: "/openapi.json" },
         layout: "modern",
+        showToolbar: "never"
       },
     });
   }

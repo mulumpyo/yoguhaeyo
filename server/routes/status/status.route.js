@@ -24,7 +24,7 @@ const statusRoutes = async (app) => {
         200: {
           type: "object",
           properties: {
-            serverTime: { type: "string", example: "2025-11-14T12:34:56Z" },
+            serverTime: { type: "string", example: "2025-11-14 09:17:04" },
           },
         },
       },
