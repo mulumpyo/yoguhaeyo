@@ -22,6 +22,7 @@ const statusRoutes = async (app) => {
       description: "DB 서버의 시간을 응답합니다.",
       response: {
         200: {
+          description: "정상",
           type: "object",
           properties: {
             serverTime: { type: "string", example: "2025-11-14 09:17:04" },
@@ -40,6 +41,7 @@ const statusRoutes = async (app) => {
       description: "Redis PING 응답을 반환합니다.",
       response: {
         200: {
+          description: "정상",
           type: "object",
           properties: {
             status: { type: "string", example: "PONG" },
