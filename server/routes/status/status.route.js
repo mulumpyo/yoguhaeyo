@@ -28,6 +28,13 @@ const statusRoutes = async (app) => {
             serverTime: { type: "string", example: "2025-11-14 09:17:04" },
           },
         },
+        500: {
+          description: "서버 오류",
+          type: "object",
+          properties: {
+            error: { type: "string" },
+          },
+        }
       },
     }),
     statusController.getDbTime
@@ -47,6 +54,13 @@ const statusRoutes = async (app) => {
             status: { type: "string", example: "PONG" },
           },
         },
+        500: {
+          description: "서버 오류",
+          type: "object",
+          properties: {
+            error: { type: "string" },
+          },
+        }
       },
     }),
     statusController.getRedisPing

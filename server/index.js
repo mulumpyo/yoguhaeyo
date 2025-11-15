@@ -34,6 +34,24 @@ const createServer = async () => {
   await app.register(fastifyCompress, { global: true });
   await app.register(fastifyHelmet, { contentSecurityPolicy: false, crossOriginResourcePolicy: false });
 
+  // Next.js
+  const nextApp = next({ dev: !isProd, dir: path.join(__dirname, "..") });
+  const handle = nextApp.getRequestHandler();
+  await nextApp.prepare();
+
+  app.all(
+    "/*",
+    { swagger: false },
+    async (req, reply) => {
+      try {
+        await handle(req.raw, reply.raw);
+        reply.hijack();
+      } catch (err) {
+        app.log.error(err);
+        reply.code(500).send("Server Error");
+      }
+  });
+
   // Swagger & Scalar
   if (!isProd) {
     await app.register(fastifySwagger, {
@@ -43,35 +61,14 @@ const createServer = async () => {
       },
     });
 
-    // openapi.json
-    app.get("/openapi.json", async (_, reply) => {
-      const swaggerObject = app.swagger();
-
-      const cleanPaths = {};
-      for (const [key, val] of Object.entries(swaggerObject.paths)) {
-        if (key === "/openapi.json" || key.startsWith("/{")) continue;
-        cleanPaths[key] = val;
-      }
-      swaggerObject.paths = cleanPaths;
-
-      reply.header("Content-Type", "application/json; charset=utf-8");
-      reply.send(swaggerObject);
-    });
-
     await app.register(ScalarApiReference, {
       routePrefix: "/docs",
       configuration: {
-        spec: { url: "/openapi.json" },
         layout: "modern",
         showToolbar: "never"
       },
     });
   }
-
-  // Next.js
-  const nextApp = next({ dev: !isProd, dir: path.join(__dirname, "..") });
-  const handle = nextApp.getRequestHandler();
-  await nextApp.prepare();
 
   if (isProd) {
     await app.register(fastifyStatic, {
@@ -81,16 +78,6 @@ const createServer = async () => {
       maxAge: "1d",
     });
   }
-
-  app.all("/*", async (req, reply) => {
-    try {
-      await handle(req.raw, reply.raw);
-      reply.hijack();
-    } catch (err) {
-      app.log.error(err);
-      reply.code(500).send("Server Error");
-    }
-  });
 
   // API
   await app.register(routes, { prefix: "/api" });
