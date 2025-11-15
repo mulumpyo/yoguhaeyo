@@ -96,7 +96,7 @@ const createServer = async () => {
       },
     },
     startRedirectPath: '/api/auth/github',
-    callbackUri: 'https://yoguhaeyo.mulumpyo.com/api/auth/callback',
+    callbackUri: '/api/auth/callback',
     scope: ['user:email'],
   });
 
