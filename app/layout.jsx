@@ -15,6 +15,7 @@ const RootLayout = ({ children }) => {
             <ul className="flex gap-4 text-sm font-medium">
               <li><a href="/" className="hover:text-indigo-500">홈 (SSR)</a></li>
               <li><a href="/app" className="hover:text-indigo-500">앱 (CSR)</a></li>
+              <li><a href="/test" className="hover:text-indigo-500">토큰 테스트</a></li>
             </ul>
           </nav>
         </header>

@@ -29,8 +29,16 @@ const AppPage = () => {
     fetchData();
   }, [count, router]);
 
-  if (loading) {
+  const logout = async () => {
+    try {
+      await axios.post("/api/auth/logout");
+      router.push("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
 
+  if (loading) {
     return null;
   }
 
@@ -39,6 +47,7 @@ const AppPage = () => {
       <h2>CSR 보안 페이지</h2>
       <p>DB 서버 시간: {serverTime}</p>
       <Button onClick={() => setCount(count + 1)}>Refresh ({count})</Button>
+      <Button onClick={logout}>로그아웃</Button>
     </div>
   );
 };

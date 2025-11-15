@@ -85,6 +85,49 @@ const authRoutes = async (app) => {
     (request, reply) => authController.isLogin(app, request, reply)
   );
 
+  // Refresh Token 사용하여 Access Token 재발급
+  app.post(
+    "/refresh",
+    createRouteOptions({
+      summary: "Access Token 재발급",
+      description: "Refresh Token을 사용하여 Access Token을 재발급합니다.",
+      response: {
+        200: {
+          description: "Access Token 재발급 완료",
+          type: "object",
+          properties: {
+            message: { type: "string", example: "Token refreshed" },
+          },
+        },
+        401: {
+          description: "Refresh Token 유효하지 않음",
+          type: "object",
+          properties: { error: { type: "string" } },
+        },
+      },
+    }),
+    (request, reply) => authController.refreshToken(app, request, reply)
+  );
+
+  // 로그아웃
+  app.post(
+    "/logout",
+    createRouteOptions({
+      summary: "로그아웃",
+      description: "모든 인증 쿠키 삭제 및 Refresh Token 무효화",
+      response: {
+        200: {
+          description: "로그아웃 성공",
+          type: "object",
+          properties: {
+            message: { type: "string", example: "Logged out" },
+          },
+        },
+      },
+    }),
+    (request, reply) => authController.logout(app, request, reply)
+  );
+
 };
 
 export default authRoutes;
