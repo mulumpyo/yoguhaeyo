@@ -1,36 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
 
-const ClientPage = () => {
-  const [count, setCount] = useState(0);
+const AppPage = () => {
   const [serverTime, setServerTime] = useState("");
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchServerTime = async () => {
+    const fetchData = async () => {
       try {
-        const { status, data } = await axios.get("/api/status/db");
-        if (status === 200) setServerTime(data.serverTime);
+        // 로그인 상태 확인
+        await axios.get("/api/auth/me");
+
+        // DB 상태 확인
+        const { data } = await axios.get("/api/status/db");
+        setServerTime(data.serverTime);
+        setLoading(false);
       } catch (err) {
-        setServerTime("Error");
+        router.push("/");
       }
     };
 
-    fetchServerTime();
-  }, [count]);
+    fetchData();
+  }, [count, router]);
+
+  if (loading) {
+
+    return null;
+  }
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-4">CSR</h2>
-
-      <div className="mt-4 flex flex-col items-start gap-2">
-        <p className="text-gray-700">DB 서버 시간: {serverTime}</p>
-        <Button onClick={() => setCount(count + 1)}>{count}</Button>
-      </div>
+      <h2>CSR 보안 페이지</h2>
+      <p>DB 서버 시간: {serverTime}</p>
+      <Button onClick={() => setCount(count + 1)}>Refresh ({count})</Button>
     </div>
   );
 };
 
-export default ClientPage;
+export default AppPage;

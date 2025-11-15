@@ -4,7 +4,7 @@ export const statusController = {
 
   /**
    * DB 서버 시간을 조회
-   * @returns {Promise<{ serverTime: string }>} DB 서버 시간 JSON 응답
+   * @returns {Promise<{ serverTime: string }>} DB 서버 시간 응답
    */
   getDbTime: async (app, req, reply) => {
     try {
@@ -17,7 +17,7 @@ export const statusController = {
 
   /**
    * Redis Ping 상태 조회
-   * @returns {Promise<{ status: string }>} 정상적으로 작동시 "Pong" 응답
+   * @returns {Promise<{ status: string }>} "Pong" 응답
    */
   getRedisPing: async (app, req, reply) => {
     try {

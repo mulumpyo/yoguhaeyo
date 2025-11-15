@@ -1,0 +1,42 @@
+import { authService } from "../../services/auth.service.js";
+
+export const authController = {
+
+  /**
+   * GitHub Oauth 로그인
+   * @description 로그인 성공시 HTTP 상태 코드 302
+   */
+  githubLoginCallback: async (app, req, reply) => {
+
+    try {
+      const { code } = req.query;
+      if (!code) {
+        return reply.code(400).send({ error: "Authorization code missing" });
+      }
+
+      await authService.loginWithGitHub(app, req, reply);
+
+      return reply.code(302).redirect("/app");
+
+    } catch (err) {
+      app.log.error(err);
+
+      return reply.code(err.status || 500).send({
+        error: err.message || "Authentication failed"
+      });
+    }
+  },
+
+  /**
+   * 로그인 상태 확인
+   * @description 로그인한 사용자일 경우 사용자의 정보를 반환
+   */
+  isLogin: async (app, req, reply) => {
+    try {
+      return reply.code(200).send({ user: req.user });
+    } catch (err) {
+      return reply.code(500).send({ error: "Failed to verify login" });
+    }
+  }
+
+};
