@@ -40,6 +40,7 @@ const createServer = async () => {
     schema: {
       type: 'object',
       required: [
+        'BASE_URL',
         'REDIS_HOST',
         'REDIS_PORT',
         'DB_HOST',
@@ -53,6 +54,9 @@ const createServer = async () => {
         'REFRESH_TOKEN_SECRET',
       ],
       properties: {
+
+        // Base URL
+        BASE_URL: { type: 'string' },
 
         // Redis
         REDIS_HOST: { type: 'string' },
@@ -96,7 +100,7 @@ const createServer = async () => {
       },
     },
     startRedirectPath: '/api/auth/github',
-    callbackUri: 'https://yoguhaeyo.mulumpyo.com/api/auth/callback',
+    callbackUri: `${app.config.BASE_URL}/api/auth/callback`,
     scope: ['user:email'],
   });
 
@@ -182,8 +186,10 @@ const createServer = async () => {
       // DB 연결 상태
       try {
           await app.mysql.pool.query("SELECT 1 AS test");
+          console.log("DB connection successful");
           app.log.info("DB connection successful");
       } catch (err) {
+          console.log("DB connection failed:", err.message);
           app.log.error("DB connection failed:", err.message);
           app.close(); 
           process.exit(1); 
@@ -192,8 +198,10 @@ const createServer = async () => {
       // Redis 연결 상태
       try {
           await app.redis.ping();
+          console.log("Redis connection successful");
           app.log.info("Redis connection successful");
       } catch (err) {
+          console.log("Redis connection failed:", err.message);
           app.log.error("Redis connection failed:", err.message);
           app.close();
           process.exit(1);
