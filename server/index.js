@@ -51,7 +51,6 @@ const createServer = async () => {
         'GITHUB_CLIENT_ID',
         'GITHUB_CLIENT_SECRET',
         'JWT_SECRET',
-        'REFRESH_TOKEN_SECRET',
       ],
       properties: {
 
@@ -73,7 +72,6 @@ const createServer = async () => {
         GITHUB_CLIENT_ID: { type: 'string' },
         GITHUB_CLIENT_SECRET: { type: 'string' },
         JWT_SECRET: { type: 'string' },
-        REFRESH_TOKEN_SECRET: { type: 'string' },
       },
     },
     dotenv: {

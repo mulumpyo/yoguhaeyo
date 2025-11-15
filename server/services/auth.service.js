@@ -1,4 +1,4 @@
-// import { authMapper } from "../mappers/auth.mapper.js";
+import { authMapper } from "../mappers/auth.mapper.js";
 import crypto from "crypto";
 
 export const authService = {
@@ -26,12 +26,23 @@ export const authService = {
 
       const githubUser = await userResponse.json();
 
+      // DB 사용자 추가 또는 업데이트
+      const result = await authMapper.upsertUser(app, githubUser);
+      if (!result.affectedRows) throw { status: 500, message: "Failed to upsert user" };
+
+      // DB 확인
+      const dbcheck = await authMapper.isUser(app, githubUser.id);
+      if (!dbcheck.length) throw { status: 401, message: "User not found after upsert" };
+
+      const user = dbcheck[0];
+
       // JWT 액세스 토큰 발급
       const jwtToken = app.jwt.sign(
         {
           githubId: githubUser.id,
           username: githubUser.login,
           avatar: githubUser.avatar_url,
+          role: user.role,
         },
         { expiresIn: "1h" } // 1시간
       );
@@ -79,9 +90,15 @@ export const authService = {
         throw { status: 401, message: "Invalid refresh token" };
       }
 
+      // DB 확인
+      const dbcheck = await authMapper.isUser(app, githubId);
+      if (!dbcheck.length) throw { status: 401, message: "User not found or disabled" };
+
+      const user = dbcheck[0];
+      
       // 새로운 Access Token 생성
       const newAccessToken = app.jwt.sign(
-        { githubId: Number(githubId) },
+        { githubId: Number(githubId), role: user.role },
         { expiresIn: "1h" }
       );
 
