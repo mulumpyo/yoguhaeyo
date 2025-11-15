@@ -6,9 +6,9 @@ export const statusController = {
    * DB 서버 시간을 조회
    * @returns {Promise<{ serverTime: string }>} DB 서버 시간 JSON 응답
    */
-  getDbTime: async (req, reply) => {
+  getDbTime: async (app, req, reply) => {
     try {
-      const serverTime = await statusService.getDbTime();
+      const serverTime = await statusService.getDbTime(app);
       return reply.send({ serverTime });
     } catch (err) {
       return reply.code(500).send({ error: err.message });
@@ -19,9 +19,9 @@ export const statusController = {
    * Redis Ping 상태 조회
    * @returns {Promise<{ status: string }>} 정상적으로 작동시 "Pong" 응답
    */
-  getRedisPing: async (req, reply) => {
+  getRedisPing: async (app, req, reply) => {
     try {
-      const status = await statusService.getRedisPing();
+      const status = await statusService.getRedisPing(app);
       return reply.send({ status });
     } catch (err) {
       return reply.code(500).send({ error: err.message });

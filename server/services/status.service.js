@@ -1,6 +1,5 @@
 import { statusMapper } from "../mappers/status.mapper.js";
 import { formatKST } from "../utils/date.js";
-import { redis } from "../utils/redis.js";
 
 export const statusService = {
 
@@ -9,8 +8,8 @@ export const statusService = {
    * @returns {Promise<string>} DB 서버 한국 기준 시간 문자열( format: YYYY-MM-DD HH:mm:SS )
    * @throws {Error} DB 조회 실패 시
    */
-  getDbTime: async () => {
-    const rawTime = await statusMapper.selectDbTime();
+  getDbTime: async (app, request, reply) => {
+    const rawTime = await statusMapper.selectDbTime(app);
     return formatKST(rawTime);
   },
 
@@ -19,8 +18,8 @@ export const statusService = {
    * @returns {Promise<string>} Redis 서버가 정상일 경우 "PONG"
    * @throws {Error} Redis 연결 실패 시
    */
-  getRedisPing: async () => {
-    return await redis.ping();
+  getRedisPing: async (app, request, reply) => {
+    return await app.redis.ping();
   },
 
 };

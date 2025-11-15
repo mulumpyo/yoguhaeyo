@@ -32,12 +32,12 @@ const statusRoutes = async (app) => {
           description: "서버 오류",
           type: "object",
           properties: {
-            error: { type: "string" },
+            error: { type: "string", example: "Database connection failed" },
           },
         }
       },
     }),
-    statusController.getDbTime
+    (request, reply) => statusController.getDbTime(app, request, reply)
   );
 
   // Redis
@@ -58,12 +58,12 @@ const statusRoutes = async (app) => {
           description: "서버 오류",
           type: "object",
           properties: {
-            error: { type: "string" },
+            error: { type: "string", example: "Redis connection failed" },
           },
         }
       },
     }),
-    statusController.getRedisPing
+    (request, reply) => statusController.getRedisPing(app, request, reply)
   );
 
 };
