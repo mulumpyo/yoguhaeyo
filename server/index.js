@@ -11,6 +11,7 @@ import fastifyMysql from "@fastify/mysql";
 import fastifyRedis from '@fastify/redis';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCookie from '@fastify/cookie';
+import fastifyOauth2 from "@fastify/oauth2";
 import next from "next";
 import routes from "./routes/index.js";
 
@@ -80,6 +81,24 @@ const createServer = async () => {
   await app.register(fastifyCompress, { global: true });
   await app.register(fastifyHelmet, { contentSecurityPolicy: false, crossOriginResourcePolicy: false });
   await app.register(fastifyCookie);
+  await app.register(fastifyOauth2, {
+    name: 'github', 
+    credentials: { 
+      client: {
+        id: app.config.GITHUB_CLIENT_ID,
+        secret: app.config.GITHUB_CLIENT_SECRET
+      },
+      auth: {
+        authorizeHost: 'https://github.com',
+        authorizePath: '/login/oauth/authorize',
+        tokenHost: 'https://github.com',
+        tokenPath: '/login/oauth/access_token',
+      },
+    },
+    startRedirectPath: '/api/auth/github',
+    callbackUri: 'https://yoguhaeyo.mulumpyo.com/api/auth/callback',
+    scope: ['user:email'],
+  });
 
   // JWT
   await app.register(fastifyJwt, { 
