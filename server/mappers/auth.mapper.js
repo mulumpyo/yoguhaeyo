@@ -24,7 +24,7 @@ export const authMapper = {
    */
   isUser: async (app, githubId) => {
     const sql = `
-      SELECT id, github_id, username, avatar, role
+      SELECT github_id, username, avatar, role
       FROM users
       WHERE github_id = ?
       LIMIT 1
