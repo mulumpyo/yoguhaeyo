@@ -9,7 +9,7 @@ const GithubLoginButton = () => {
   return (
     <Button
       onClick={githubLogin}
-      className="px-4 py-2 hover:bg-gray-800"
+      className="px-4 py-2"
     >
       GitHub 계정으로 시작하기
     </Button>
