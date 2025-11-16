@@ -1,4 +1,5 @@
 export const githubProvider = {
+
   getAccessToken: async (app, req) => {
     const tokenResponse = await app.github.getAccessTokenFromAuthorizationCodeFlow(req);
     return tokenResponse?.token?.access_token;
@@ -12,4 +13,5 @@ export const githubProvider = {
     if (!response.ok) throw { status: 502, message: "GitHub API error" };
     return response.json();
   }
+  
 };

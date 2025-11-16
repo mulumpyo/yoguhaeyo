@@ -20,4 +20,5 @@ export const refreshTokenProvider = {
   delete: async (app, refreshToken) => {
     return app.redis.del(`refresh:${refreshToken}`);
   }
+  
 };

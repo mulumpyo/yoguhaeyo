@@ -9,7 +9,7 @@ const RootLayout = ({ children }) => {
   return (
     <html lang="ko">
       <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
-        <header className="border-b bg-white shadow-sm">
+        {/* <header className="border-b bg-white shadow-sm">
           <nav className="container mx-auto flex h-16 items-center justify-between px-4">
             <h1 className="text-lg font-bold text-indigo-600">Yoguhaeyo</h1>
             <ul className="flex gap-4 text-sm font-medium">
@@ -18,11 +18,11 @@ const RootLayout = ({ children }) => {
               <li><a href="/test" className="hover:text-indigo-500">토큰 테스트</a></li>
             </ul>
           </nav>
-        </header>
+        </header> */}
 
-        <main className="container mx-auto px-4 py-8">
+        {/* <main className="container mx-auto px-4 py-8"> */}
           {children}
-        </main>
+        {/* </main> */}
       </body>
     </html>
   );
