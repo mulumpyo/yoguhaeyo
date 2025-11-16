@@ -22,7 +22,7 @@ export const authService = {
     const user = (await authMapper.isUser(app, githubUser.id))[0];
     if (!user) throw { status: 401, message: "User not found after upsert" };
 
-    // AccseeToken 토큰 생성
+    // accseeToken 토큰 생성
     const jwtToken = jwtProvider.signAccessToken(app, {
       githubId: githubUser.id,
       username: githubUser.login,
