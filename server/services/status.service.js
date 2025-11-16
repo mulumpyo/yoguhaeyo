@@ -1,5 +1,6 @@
 import { statusMapper } from "../mappers/status.mapper.js";
 import { formatKST } from "../utils/date.js";
+import { redisProvider } from "../providers/redis.provider.js";
 
 export const statusService = {
 
@@ -18,8 +19,8 @@ export const statusService = {
    * @returns {Promise<string>} Redis 서버가 정상일 경우 "PONG"
    * @throws {Error} Redis 연결 실패 시
    */
-  getRedisPing: async (app, request, reply) => {
-    return await app.redis.ping();
+  getRedisPing: async (app) => {
+    return await redisProvider.ping(app);
   },
 
 };

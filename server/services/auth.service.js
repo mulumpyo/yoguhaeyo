@@ -1,5 +1,8 @@
 import { authMapper } from "../mappers/auth.mapper.js";
-import crypto from "crypto";
+import { githubProvider } from "../providers/github.provider.js";
+import { jwtProvider } from "../providers/jwt.provider.js";
+import { refreshTokenProvider } from "../providers/refreshToken.provider.js";
+import { cookieProvider } from "../providers/cookie.provider.js";
 
 export const authService = {
 
@@ -8,72 +11,31 @@ export const authService = {
    * @throws {object} {status, message} 오류 발생 시
    */
   loginWithGitHub: async (app, req, reply) => {
-    try {
+    const isProd = process.env.NODE_ENV === "production";
 
-      const isProd = process.env.NODE_ENV === "production";
+    // GitHub 인증
+    const accessToken = await githubProvider.getAccessToken(app, req);
+    const githubUser = await githubProvider.getUserInfo(accessToken);
 
-      // GitHub Access Token 발급
-      const tokenResponse = await app.github.getAccessTokenFromAuthorizationCodeFlow(req);
-      const accessToken = tokenResponse?.token?.access_token;
-      if (!accessToken) throw { status: 401, message: "Failed to get access token" };
+    // DB upsert
+    await authMapper.upsertUser(app, githubUser);
+    const user = (await authMapper.isUser(app, githubUser.id))[0];
+    if (!user) throw { status: 401, message: "User not found after upsert" };
 
-      // GitHub 유저 정보 조회
-      const userResponse = await fetch("https://api.github.com/user", {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+    // AccseeToken 토큰 생성
+    const jwtToken = jwtProvider.signAccessToken(app, {
+      githubId: githubUser.id,
+      username: githubUser.login,
+      avatar: githubUser.avatar_url,
+      role: user.role,
+    });
 
-      if (!userResponse.ok) throw { status: 502, message: "GitHub API error" };
+    // refreshToken 생성
+    const refreshToken = refreshTokenProvider.generate();
+    await refreshTokenProvider.save(app, refreshToken, githubUser.id);
 
-      const githubUser = await userResponse.json();
-
-      // DB 사용자 추가 또는 업데이트
-      const result = await authMapper.upsertUser(app, githubUser);
-      if (!result.affectedRows) throw { status: 500, message: "Failed to upsert user" };
-
-      // DB 확인
-      const dbcheck = await authMapper.isUser(app, githubUser.id);
-      if (!dbcheck.length) throw { status: 401, message: "User not found after upsert" };
-
-      const user = dbcheck[0];
-
-      // JWT 액세스 토큰 발급
-      const jwtToken = app.jwt.sign(
-        {
-          githubId: githubUser.id,
-          username: githubUser.login,
-          avatar: githubUser.avatar_url,
-          role: user.role,
-        },
-        { expiresIn: "1h" } // 1시간
-      );
-
-      // 리프레시 토큰 생성
-      const refreshToken = crypto.randomBytes(64).toString("hex");
-
-      // 리프레시 토큰 Redis 저장
-      await app.redis.set(`refresh:${refreshToken}`, githubUser.id, "EX", 60 * 60 * 24 * 30); // 30일
-
-      // 쿠키 저장
-      reply
-        .setCookie("access_token", jwtToken, {
-          httpOnly: true,
-          secure: isProd,
-          sameSite: isProd ? "Strict" : "Lax",
-          path: "/",
-          maxAge: 60 * 60,
-        })
-        .setCookie("refresh_token", refreshToken, {
-          httpOnly: true,
-          secure: isProd,
-          sameSite: isProd ? "Strict" : "Lax",
-          path: "/",
-          maxAge: 60 * 60 * 24 * 30,
-        });
-
-    } catch (err) {
-      app.log.error(err);
-      throw err.status ? err : { status: 500, message: "Authentication failed" };
-    }
+    // 쿠키 저장
+    cookieProvider.setAuthCookies(reply, jwtToken, refreshToken, isProd);
   },
 
   /**
@@ -84,50 +46,34 @@ export const authService = {
   refreshAccessToken: async (app, refreshToken, reply) => {
     const isProd = process.env.NODE_ENV === "production";
 
-    try {
-      const githubId = await app.redis.get(`refresh:${refreshToken}`);
-      if (!githubId) {
-        throw { status: 401, message: "Invalid refresh token" };
-      }
+    const githubId = await refreshTokenProvider.get(app, refreshToken);
+    if (!githubId) throw { status: 401, message: "Invalid refresh token" };
 
-      // DB 확인
-      const dbcheck = await authMapper.isUser(app, githubId);
-      if (!dbcheck.length) throw { status: 401, message: "User not found or disabled" };
+    const user = (await authMapper.isUser(app, githubId))[0];
+    if (!user) throw { status: 401, message: "User not found or disabled" };
 
-      const user = dbcheck[0];
-      
-      // 새로운 Access Token 생성
-      const newAccessToken = app.jwt.sign(
-        { githubId: Number(githubId), role: user.role },
-        { expiresIn: "1h" }
-      );
+    const newAccessToken = jwtProvider.signAccessToken(app, {
+      githubId: Number(githubId),
+      role: user.role,
+    });
 
-      reply.setCookie("access_token", newAccessToken, {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: isProd ? "Strict" : "Lax",
-        path: "/",
-        maxAge: 60 * 60,
-      });
+    reply.setCookie("access_token", newAccessToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "Strict" : "Lax",
+      path: "/",
+      maxAge: 60 * 60,
+    });
 
-      return { message: "Token refreshed" };
-
-    } catch (err) {
-      app.log.error(err);
-      throw err.status ? err : { status: 500, message: "Token refresh failed" };
-    }
+    return { message: "Token refreshed" };
   },
 
   /**
    * refreshToken 무효화
    * @throws {object} {status, message} 오류 발생 시
    */
-  invalidateRefreshToken: async (app, refreshToken) => {
-    try {
-      await app.redis.del(`refresh:${refreshToken}`);
-    } catch (err) {
-      app.log.error("Failed to invalidate refresh token:", err);
-    }
-  },
+  invalidateRefreshToken: (app, refreshToken) => {
+    return refreshTokenProvider.delete(app, refreshToken);
+  }
 
 };
