@@ -181,29 +181,29 @@ const createServer = async () => {
   // 연결 상태 확인
   app.addHook('onReady', async () => {
 
-      // DB 연결 상태
-      try {
-          await app.mysql.pool.query("SELECT 1 AS test");
-          console.log("DB connection successful");
-          app.log.info("DB connection successful");
-      } catch (err) {
-          console.log("DB connection failed:", err.message);
-          app.log.error("DB connection failed:", err.message);
-          app.close(); 
-          process.exit(1); 
-      }
+    // DB 연결 상태
+    try {
+      await app.mysql.pool.query("SELECT 1 AS test");
+      console.log("DB connection successful");
+      app.log.info("DB connection successful");
+    } catch (err) {
+      console.log("DB connection failed:", err.message);
+      app.log.error("DB connection failed:", err.message);
+      app.close(); 
+      process.exit(1); 
+    }
 
-      // Redis 연결 상태
-      try {
-          await app.redis.ping();
-          console.log("Redis connection successful");
-          app.log.info("Redis connection successful");
-      } catch (err) {
-          console.log("Redis connection failed:", err.message);
-          app.log.error("Redis connection failed:", err.message);
-          app.close();
-          process.exit(1);
-      }
+    // Redis 연결 상태
+    try {
+      await app.redis.ping();
+      console.log("Redis connection successful");
+      app.log.info("Redis connection successful");
+    } catch (err) {
+      console.log("Redis connection failed:", err.message);
+      app.log.error("Redis connection failed:", err.message);
+      app.close();
+      process.exit(1);
+    }
   });
   
   await app.listen({ port, host: "0.0.0.0" });

@@ -7,7 +7,6 @@ export const authController = {
    * @description 로그인 성공시 HTTP 상태 코드 302
    */
   githubLoginCallback: async (app, req, reply) => {
-
     try {
       const { code } = req.query;
       if (!code) {
@@ -25,6 +24,7 @@ export const authController = {
         error: err.message || "Authentication failed"
       });
     }
+  
   },
 
   /**
