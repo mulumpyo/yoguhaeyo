@@ -14,7 +14,7 @@ export const cookieProvider = {
         secure: isProd,
         sameSite: isProd ? "Strict" : "Lax",
         path: "/",
-        maxAge: 60 * 60 * 24 * 30,
+        maxAge: 60 * 60 * 24 * 7,
       });
   }
   

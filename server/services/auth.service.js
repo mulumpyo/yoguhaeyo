@@ -55,6 +55,8 @@ export const authService = {
 
     const newAccessToken = jwtProvider.signAccessToken(app, {
       githubId: Number(githubId),
+      username: user.username,
+      avatar: user.avatar,
       role: user.role,
     });
 
