@@ -3,7 +3,7 @@
 import {
   Settings,
   Bell,
-  ChevronsUpDown,
+  MoreVertical,
   CreditCard,
   LogOut,
   Sparkles,
@@ -47,7 +47,7 @@ const NavUser = ({
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(`@${user.githubId}`);
-    toast.success("사용자 번호가 복사되었어요 :)");
+    toast.success("사용자 번호가 클립보드에 복사되었어요 :)");
   };
 
   const handleLogout = async () => {
@@ -66,7 +66,7 @@ const NavUser = ({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer hover:bg-gray-200 transition-colors duration-200">
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer hover:bg-[#f5f5f5] transition-colors duration-200">
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.username} />
                 <AvatarFallback className="rounded-lg"></AvatarFallback>
@@ -74,7 +74,7 @@ const NavUser = ({
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.username}</span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              <MoreVertical className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -118,7 +118,7 @@ const NavUser = ({
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings />
-                계정 설정
+                설정
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

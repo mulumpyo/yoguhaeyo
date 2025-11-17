@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react";
-import { ChevronsUpDown, Plus } from "lucide-react";
+import { Frame, ChevronsUpDown, ChevronRight, Plus } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -20,15 +20,13 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const TeamSwitcher = ({
-  teams
+const ProjectSwitcher = ({
+  projects
 }) => {
   const { isMobile } = useSidebar();
-  const [activeTeam, setActiveTeam] = React.useState(teams[0]);
+  const [activeProject, setActiveProject] = React.useState(projects[0]);
 
-  if (!activeTeam) {
-    return null;
-  }
+  if (!activeProject) return null;
 
   return (
     <SidebarMenu>
@@ -40,13 +38,13 @@ const TeamSwitcher = ({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
               <div
                 className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <activeTeam.logo className="size-4" />
+                <Frame className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {activeTeam.name}
+                  {activeProject.name}
                 </span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
+                <span className="truncate text-xs">{activeProject.description}</span>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
@@ -57,24 +55,33 @@ const TeamSwitcher = ({
             side={isMobile ? "bottom" : "right"}
             sideOffset={4}>
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Teams
+              진행 중인 프로젝트
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
-              <DropdownMenuItem key={team.name} onClick={() => setActiveTeam(team)} className="gap-2 p-2">
+            {projects.map((project, index) => (
+              <DropdownMenuItem key={project.name} onClick={() => setActiveProject(project)} className="gap-2 p-2">
                 <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <team.logo className="size-4 shrink-0" />
+                  <Frame className="size-4 shrink-0" />
                 </div>
-                {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                {project.name}
+                {/* <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut> */}
               </DropdownMenuItem>
             ))}
+              <DropdownMenuItem
+                onClick={() => router.push("/app/projects")}
+                className="gap-2 p-2 justify-center"
+              >
+                <span className="font-medium items-center gap-2 text-muted-foreground">
+                  전체 프로젝트 보기
+                </span>
+                <ChevronRight className="size-4 text-muted-foreground" />
+              </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="gap-2 p-2">
               <div
                 className="flex size-6 items-center justify-center rounded-md border bg-background">
                 <Plus className="size-4" />
               </div>
-              <div className="font-medium text-muted-foreground">Add team</div>
+              <div className="font-medium text-muted-foreground">프로젝트 생성</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -83,4 +90,4 @@ const TeamSwitcher = ({
   );
 };
 
-export { TeamSwitcher };
+export { ProjectSwitcher };
