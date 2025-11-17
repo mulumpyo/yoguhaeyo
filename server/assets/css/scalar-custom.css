@@ -1,0 +1,24 @@
+/** * Scalar API Reference UI 폰트 변경을 위한 Custom CSS
+ * Pretendard (프리텐다드) 폰트 적용
+ */
+
+:root {
+  --scalar-font: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+
+  --scalar-font-code: Consolas, 'D2 Coding', Monaco, 'Courier New', monospace;
+}
+
+body, .scalar-api-reference {
+  font-family: var(--scalar-font) !important;
+}
+
+/* API 문서 제목 */
+.t-doc__header__title {
+  font-weight: 700;
+}
+
+/* 코드 블록 */
+.scalar-api-reference pre, 
+.scalar-api-reference code {
+  font-size: 0.9em;
+}

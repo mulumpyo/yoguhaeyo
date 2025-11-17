@@ -1,5 +1,6 @@
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from 'fs';
 import fastify from "fastify";
 import fastifyEnv from '@fastify/env';
 import fastifySwagger from "@fastify/swagger";
@@ -21,6 +22,9 @@ const __dirname = path.dirname(__filename);
 const isProd = process.env.NODE_ENV === "production";
 const port = process.env.PORT || 3000;
 
+const SCALAR_CUSTOM_CSS_PATH = path.join(__dirname, '../server/assets/css/scalar-custom.css');
+let customScalarCss = '';
+
 // Log
 const app = fastify({
   logger: !isProd
@@ -32,6 +36,15 @@ const app = fastify({
       }
     : { level: "warn" },
 });
+
+if (!isProd) {
+    try {
+        customScalarCss = fs.readFileSync(SCALAR_CUSTOM_CSS_PATH, 'utf8');
+        app.log.info('Scalar custom CSS loaded successfully.');
+    } catch (error) {
+        app.log.warn(`Failed to read custom CSS file at ${SCALAR_CUSTOM_CSS_PATH}: ${error.message}`);
+    }
+}
 
 const createServer = async () => {
   
@@ -141,7 +154,8 @@ const createServer = async () => {
       routePrefix: "/docs",
       configuration: {
         layout: "modern",
-        showToolbar: "never"
+        showToolbar: "never",
+        customCss: customScalarCss,
       },
     });
   }
