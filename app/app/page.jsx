@@ -16,44 +16,21 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 
 const AppPage = () => {
-
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   const handleLogout = async () => {
     try {
       await axios.post("/api/auth/logout");
-      router.push("/"); // 홈 또는 로그인 페이지로
+      router.push("/");
     } catch (err) {
       console.error("Logout failed:", err);
     }
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-
-        // 로그인 상태 확인
-        await axios.get("/api/auth/me");
-
-        setLoading(false);
-      } catch (err) {
-        router.push("/");
-      }
-    };
-
-    fetchData();
-  }, [router]);
-
-  if (loading) {
-    return null;
-  }
 
   return (
     <SidebarProvider>
@@ -77,19 +54,13 @@ const AppPage = () => {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          {loading ? (
-            <div className="flex items-center justify-center h-full">Loading...</div>
-          ) : (
-            <>
-            <Button onClick={handleLogout}>로그아웃</Button>
-              <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                <div className="aspect-video rounded-xl bg-muted/50" />
-                <div className="aspect-video rounded-xl bg-muted/50" />
-                <div className="aspect-video rounded-xl bg-muted/50" />
-              </div>
-              <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
-            </>
-          )}
+          <Button onClick={handleLogout}>로그아웃</Button>
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            <div className="aspect-video rounded-xl bg-muted/50" />
+            <div className="aspect-video rounded-xl bg-muted/50" />
+            <div className="aspect-video rounded-xl bg-muted/50" />
+          </div>
+          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
         </div>
       </SidebarInset>
     </SidebarProvider>
