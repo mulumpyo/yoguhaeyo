@@ -1,29 +1,17 @@
-import { NextResponse } from "next/server";
-
-const protectedRoutes = ["/app"];
+import { NextResponse } from 'next/server';
 
 const proxy = (req) => {
-  const { pathname } = req.nextUrl;
+  const token = req.cookies.get('access_token');
 
-  // 비보호 경로
-  if (!protectedRoutes.some((route) => pathname.startsWith(route))) {
-    return NextResponse.next();
+  if (token) {
+    return NextResponse.redirect(new URL('/app', req.url));
   }
 
-  // JWT 쿠키 확인
-  const token = req.cookies.get("access_token")?.value;
-
-  if (!token) {
-    // 로그인 안 됨 => 로그인 페이지로 리다이렉트
-    return NextResponse.redirect(new URL("/", req.url));
-  }
-
-  // 로그인 됨 => 요청 계속
   return NextResponse.next();
 };
 
 export const config = {
-  matcher: ["/app/:path*"],
+  matcher: ['/'],
 };
 
 export default proxy;
