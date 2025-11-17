@@ -25,10 +25,7 @@ export const authService = {
 
     // accseeToken 토큰 생성
     const jwtToken = jwtProvider.signAccessToken(app, {
-      githubId: githubUser.id,
-      username: githubUser.login,
-      avatar: githubUser.avatar_url,
-      role: user.role,
+      githubId: Number(githubUser.id),
     });
 
     // refreshToken 생성
@@ -37,6 +34,15 @@ export const authService = {
 
     // 쿠키 저장
     cookieProvider.setAuthCookies(reply, jwtToken, refreshToken, isProd);
+  },
+
+  /**
+   * GithubId 값으로 유저 정보 조회
+   * @returns {object} { user: { githubId, username, avatar, role }} }
+   * @throws {object} {status, message} 오류 발생 시
+   */
+  getUserByGithubId: async (app, githubId) => {
+    return await authMapper.selectUserByGithubId(app, githubId)
   },
 
   /**
@@ -55,9 +61,6 @@ export const authService = {
 
     const newAccessToken = jwtProvider.signAccessToken(app, {
       githubId: Number(githubId),
-      username: user.username,
-      avatar: user.avatar,
-      role: user.role,
     });
 
     reply.setCookie("access_token", newAccessToken, {

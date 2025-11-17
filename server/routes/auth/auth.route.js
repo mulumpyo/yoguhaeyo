@@ -65,6 +65,7 @@ const authRoutes = async (app) => {
                   githubId: { type: "number", example: 123456 },
                   username: { type: "string", example: "octocat" },
                   avatar: { type: "string", example: "https://github.com/images/avatar.png" },
+                  role: { type: "string", example: "user" }
                 },
               },
             },
@@ -74,15 +75,20 @@ const authRoutes = async (app) => {
             type: "object",
             properties: { error: { type: "string", example: "Unauthorized" } },
           },
+          404: {
+            description: "사용자를 찾을 수 없음",
+            type: "object",
+            properties: { error: { type: "string", example: "User not found" } },
+          },
           500: {
             description: "서버 오류",
             type: "object",
-            properties: { error: { type: "string" , example: "Internal Server Error" } },
+            properties: { error: { type: "string" , example: "Failed to verify login" } },
           },
         },
       }),
     },
-    (request, reply) => authController.isLogin(app, request, reply)
+    (request, reply) => authController.getLoginUser(app, request, reply)
   );
 
   // Refresh Token 사용하여 Access Token 재발급

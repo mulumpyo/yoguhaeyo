@@ -34,9 +34,16 @@ export const authController = {
    * 로그인 상태 확인
    * @description 로그인한 사용자일 경우 사용자의 정보를 반환
    */
-  isLogin: async (app, req, reply) => {
+  getLoginUser: async (app, req, reply) => {
     try {
-      return reply.code(200).send({ user: req.user });
+      const githubId = req.user.githubId;
+      const user = await authService.getUserByGithubId(app, githubId);
+
+      if (!user) {
+        return reply.code(404).send({ error: "User not found" });
+      }
+
+      return reply.send({ user });
     } catch (err) {
       return reply.code(500).send({ error: "Failed to verify login" });
     }

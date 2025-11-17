@@ -22,7 +22,7 @@ export const authMapper = {
     if (!userRow) return null;
 
     return {
-      id: userRow.github_id,
+      githubId: userRow.github_id,
       username: userRow.username,
       avatar: userRow.avatar,
       role: userRow.role ?? "user",

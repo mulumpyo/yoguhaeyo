@@ -5,9 +5,13 @@ export const useAuth = () => {
   const [user, setUser] = useState();
 
   useEffect(() => {
-    axios.get("/api/auth/me").then(res => {
-      setUser(res.data.user);
-    });
+    const fetchUser = async () => {
+      const { data } = await axios.get("/api/auth/me");
+      setUser(data.user);
+    };
+
+    fetchUser();
+    
   }, []);
 
   return user;
