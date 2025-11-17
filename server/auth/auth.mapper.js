@@ -1,4 +1,4 @@
-import { authRepository } from "../repository/auth.repository.js";
+import { authRepository } from "./auth.repository.js";
 
 export const authMapper = {
 

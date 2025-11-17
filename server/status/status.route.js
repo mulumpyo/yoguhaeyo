@@ -1,5 +1,5 @@
 import { statusController } from "./status.controller.js";
-import { verifyToken } from "../../middlewares/auth.js";
+import { verifyToken } from "../common/middlewares/auth.js";
 
 // Route 공통
 const createRouteOptions = ({ summary, description, response }) => ({

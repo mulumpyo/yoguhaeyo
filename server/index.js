@@ -14,7 +14,7 @@ import fastifyJwt from '@fastify/jwt';
 import fastifyCookie from '@fastify/cookie';
 import fastifyOauth2 from "@fastify/oauth2";
 import next from "next";
-import routes from "./routes/index.js";
+import routes from "./routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

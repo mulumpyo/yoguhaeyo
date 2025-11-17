@@ -1,4 +1,4 @@
-import { statusRepository } from "../repository/status.repository.js";
+import { statusRepository } from "./status.repository.js";
 
 export const statusMapper = {
 

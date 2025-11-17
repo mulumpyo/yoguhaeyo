@@ -1,8 +1,8 @@
-import { authMapper } from "../mappers/auth.mapper.js";
-import { githubProvider } from "../providers/github.provider.js";
-import { jwtProvider } from "../providers/jwt.provider.js";
-import { refreshTokenProvider } from "../providers/refreshToken.provider.js";
-import { cookieProvider } from "../providers/cookie.provider.js";
+import { authMapper } from "./auth.mapper.js";
+import { githubProvider } from "../common/providers/github.provider.js";
+import { jwtProvider } from "../common/providers/jwt.provider.js";
+import { refreshTokenProvider } from "../common/providers/refreshToken.provider.js";
+import { cookieProvider } from "../common/providers/cookie.provider.js";
 
 export const authService = {
 

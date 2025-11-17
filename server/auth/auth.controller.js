@@ -1,4 +1,4 @@
-import { authService } from "../../services/auth.service.js";
+import { authService } from "./auth.service.js";
 
 export const authController = {
 
