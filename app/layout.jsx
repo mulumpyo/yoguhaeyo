@@ -1,4 +1,5 @@
 import "./styles/tailwind.css";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata = {
   title: "Yoguhaeyo",
@@ -22,6 +23,7 @@ const RootLayout = ({ children }) => {
 
         {/* <main className="container mx-auto px-4 py-8"> */}
           {children}
+          <Toaster />
         {/* </main> */}
       </body>
     </html>

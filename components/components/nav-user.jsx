@@ -1,7 +1,7 @@
 "use client"
 
 import {
-  BadgeCheck,
+  Settings,
   Bell,
   ChevronsUpDown,
   CreditCard,
@@ -32,10 +32,32 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
+import { toast } from "sonner";
+
+import axios from "axios";
+import { useRouter } from "next/navigation";
+
 const NavUser = ({
   user
 }) => {
   const { isMobile } = useSidebar();
+  const router = useRouter();
+
+  if (!user) return null;
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(`@${user.githubId}`);
+    toast.success("사용자 번호가 복사되었어요 :)");
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axios.post("/api/auth/logout");
+      router.push("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -44,14 +66,13 @@ const NavUser = ({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer hover:bg-gray-200 transition-colors duration-200">
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarImage src={user.avatar} alt={user.username} />
+                <AvatarFallback className="rounded-lg"></AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-semibold">{user.username}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -64,41 +85,46 @@ const NavUser = ({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarImage src={user.avatar} alt={user.username} />
+                  <AvatarFallback className="rounded-lg"></AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate font-semibold">{user.username}</span>
+                  <span 
+                    className="truncate text-xs cursor-pointer text-gray-800 hover:text-gray-400 transition-colors duration-200"
+                    onClick={handleCopy}
+                  >
+                    @{user.githubId}
+                  </span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
+            {/* <DropdownMenuGroup>
               <DropdownMenuItem>
                 <Sparkles />
-                Upgrade to Pro
+                플랜 업그레이드
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator /> */}
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
+              {/* <DropdownMenuItem>
                 <CreditCard />
-                Billing
-              </DropdownMenuItem>
+                결제
+              </DropdownMenuItem> */}
               <DropdownMenuItem>
                 <Bell />
-                Notifications
+                알림
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Settings />
+                계정 설정
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout} >
               <LogOut />
-              Log out
+              로그아웃
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

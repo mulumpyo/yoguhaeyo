@@ -26,6 +26,9 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
+import { useState, useEffect } from 'react';
+import axios from "axios";
+
 // This is sample data.
 const data = {
   user: {
@@ -159,6 +162,21 @@ const data = {
 const AppSidebar = ({
   ...props
 }) => {
+
+  const [user, setUser] = useState();
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const { data } = await axios.get('/api/auth/me');
+        setUser(data.user);
+      } catch (err) {
+        console.error("사용자 정보를 가져오지 못 하였습니다.");
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -169,7 +187,7 @@ const AppSidebar = ({
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

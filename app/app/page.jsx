@@ -16,21 +16,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import { useRouter } from "next/navigation";
-import axios from "axios";
-import { Button } from "@/components/ui/button";
-
 const AppPage = () => {
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    try {
-      await axios.post("/api/auth/logout");
-      router.push("/");
-    } catch (err) {
-      console.error("Logout failed:", err);
-    }
-  };
 
   return (
     <SidebarProvider>
@@ -43,18 +29,17 @@ const AppPage = () => {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">Building Your Application</BreadcrumbLink>
+                  <BreadcrumbLink href="/app">홈</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                  <BreadcrumbPage>대시보드</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <Button onClick={handleLogout}>로그아웃</Button>
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
             <div className="aspect-video rounded-xl bg-muted/50" />
             <div className="aspect-video rounded-xl bg-muted/50" />
