@@ -1,9 +1,8 @@
-// middleware.js
 import { NextResponse } from "next/server";
 
 const protectedRoutes = ["/app"];
 
-export const middleware = (req) => {
+const proxy = (req) => {
   const { pathname } = req.nextUrl;
 
   // 비보호 경로
@@ -26,3 +25,5 @@ export const middleware = (req) => {
 export const config = {
   matcher: ["/app/:path*"],
 };
+
+export default proxy;
