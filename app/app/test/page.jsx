@@ -4,8 +4,7 @@ import { AppLayout } from "@/components/app-layout";
 import { useAuth } from "@/hooks/useAuth";
 
 const TestPage = () => {
-  const { user, loading } = useAuth();
-  if (loading) return null;
+  const user = useAuth();
 
   return (
     <AppLayout user={user} pageTitle="테스트">
