@@ -145,7 +145,7 @@ const createServer = async () => {
   if (!isProd) {
     await app.register(fastifySwagger, {
       openapi: {
-        info: { title: "Yoguhaeyo API", version: "1.0.0" },
+        info: { title: "yoguhaeyo API", version: "1.0.0" },
         servers: [{ url: "http://localhost:3000/api" }],
       },
     });
