@@ -57,7 +57,7 @@ export const authService = {
     if (!githubId) throw { status: 401, message: "Invalid refresh token" };
 
     const user = (await authMapper.selectUserByGithubId(app, githubId));
-    if (!user) throw { status: 401, message: "User not found or disabled" };
+    if (!user) throw { status: 404, message: "User not found or disabled" };
 
     const newAccessToken = jwtProvider.signAccessToken(app, {
       githubId: Number(githubId),

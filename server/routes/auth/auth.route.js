@@ -24,22 +24,22 @@ const authRoutes = async (app) => {
         400: {
           description: "Authorization Code 누락",
           type: "object",
-          properties: { error: { type: "string" } }
+          properties: { error: { type: "string", example: "Authorization code missing" } }
         },
         401: {
           description: "토큰 발급 실패",
           type: "object",
-          properties: { error: { type: "string" } }
+          properties: { error: { type: "string", example: "User not found after upsert" } }
         },
         500: {
           description: "서버 인증 실패",
           type: "object",
-          properties: { error: { type: "string" } }
+          properties: { error: { type: "string", example: "Authentication failed" } }
         }, 
         502: {
           description: "GitHub API 오류",
           type: "object",
-          properties: { error: { type: "string" } }
+          properties: { error: { type: "string", example: "GitHub API error" } }
         },
       },
     }),
@@ -108,7 +108,12 @@ const authRoutes = async (app) => {
         401: {
           description: "Refresh Token 유효하지 않음",
           type: "object",
-          properties: { error: { type: "string" } },
+          properties: { error: { type: "string", example: "Invalid refresh token" } },
+        },
+        404: {
+          description: "사용자를 찾을 수 없거나 비활성화됨",
+          type: "object",
+          properties: { error: { type: "string", example: "Refresh token not found" } },
         },
       },
     }),
