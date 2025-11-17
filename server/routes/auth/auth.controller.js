@@ -15,16 +15,19 @@ export const authController = {
 
       await authService.loginWithGitHub(app, req, reply);
 
-      return reply.code(302).redirect("/app");
+      reply.type("text/html");
+      return reply.send(`
+        <script>
+          window.location.href = "/app";
+        </script>
+      `);
 
     } catch (err) {
       app.log.error(err);
-
       return reply.code(err.status || 500).send({
         error: err.message || "Authentication failed"
       });
     }
-  
   },
 
   /**
