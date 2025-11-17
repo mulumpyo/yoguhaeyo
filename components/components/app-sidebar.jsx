@@ -42,43 +42,14 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
-      url: "#",
+      title: "대시보드",
+      url: "/app",
       icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
     },
     {
-      title: "Models",
-      url: "#",
+      title: "테스트",
+      url: "/app/test",
       icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
     },
     {
       title: "Documentation",

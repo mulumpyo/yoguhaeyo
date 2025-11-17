@@ -66,7 +66,7 @@ const NavUser = ({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer hover:bg-[#f5f5f5] transition-colors duration-200">
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer hover:bg-accent transition-colors duration-200">
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.username} />
                 <AvatarFallback className="rounded-lg"></AvatarFallback>
@@ -91,7 +91,7 @@ const NavUser = ({
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user.username}</span>
                   <span 
-                    className="truncate text-xs cursor-pointer text-gray-800 hover:text-gray-400 transition-colors duration-200"
+                    className="truncate text-xs cursor-pointer text-gray-500 hover:text-accent-foreground transition-colors duration-200"
                     onClick={handleCopy}
                   >
                     @{user.githubId}
