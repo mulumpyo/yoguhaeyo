@@ -19,7 +19,8 @@ export const authService = {
 
     // DB upsert
     await authMapper.upsertUser(app, githubUser);
-    const user = (await authMapper.isUser(app, githubUser.id))[0];
+    const user = (await authMapper.selectUserByGithubId(app, githubUser.id));
+    
     if (!user) throw { status: 401, message: "User not found after upsert" };
 
     // accseeToken 토큰 생성
@@ -49,7 +50,7 @@ export const authService = {
     const githubId = await refreshTokenProvider.get(app, refreshToken);
     if (!githubId) throw { status: 401, message: "Invalid refresh token" };
 
-    const user = (await authMapper.isUser(app, githubId))[0];
+    const user = (await authMapper.selectUserByGithubId(app, githubId))[0];
     if (!user) throw { status: 401, message: "User not found or disabled" };
 
     const newAccessToken = jwtProvider.signAccessToken(app, {

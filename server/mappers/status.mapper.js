@@ -1,3 +1,5 @@
+import { statusRepository } from "../repository/status.repository.js";
+
 export const statusMapper = {
 
   /**
@@ -6,7 +8,7 @@ export const statusMapper = {
    * @throws {Error} DB 쿼리 실패 시
    */
   selectDbTime: async (app) => {
-    const [rows] = await app.mysql.pool.query("SELECT NOW() AS now");
+    const rows = await statusRepository.selectDbTime(app);
     return rows[0].now;
   },
 
