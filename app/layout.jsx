@@ -2,8 +2,8 @@ import "./styles/tailwind.css";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata = {
-  title: "Yoguhaeyo",
-  description: "Next.js App Router (SSR + CSR)",
+  title: "yoguhaeyo",
+  description: "팀과 개발 문서를 한 곳에서, 빠르고 깔끔하게 😎",
 };
 
 const RootLayout = ({ children }) => {

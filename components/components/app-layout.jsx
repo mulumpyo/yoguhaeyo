@@ -6,11 +6,12 @@ import { Separator } from "@/components/ui/separator";
 import { AppSidebar } from "./app-sidebar";
 
 export const AppLayout = ({ user, pageTitle, children }) => {
+
   return (
     <SidebarProvider>
       <AppSidebar user={user} />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2">
+        <header className="flex h-16 shrink-0 items-center gap-2 bg-gray-50">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
@@ -27,7 +28,7 @@ export const AppLayout = ({ user, pageTitle, children }) => {
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-gray-50">
           {children}
         </div>
       </SidebarInset>
