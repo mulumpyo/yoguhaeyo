@@ -6,7 +6,7 @@ export const logout = async () => {
     await axios.post("/api/auth/logout");
 
     if (typeof window !== "undefined") {
-      window.location.href = "/";
+      window.location.replace("/");
     }
   } catch (e) {
     console.error("Logout failed:", e);
