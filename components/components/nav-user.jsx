@@ -20,12 +20,10 @@ import {
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 
 import { toast } from "sonner";
-import axios from "axios";
-import { useRouter } from "next/navigation";
+import { logout } from "@/lib/auth";
 
 const NavUser = ({ user }) => {
   const { isMobile } = useSidebar();
-  const router = useRouter();
 
   if (!user) return null;
 
@@ -35,12 +33,7 @@ const NavUser = ({ user }) => {
   };
 
   const handleLogout = async () => {
-    try {
-      await axios.post("/api/auth/logout");
-      router.push("/");
-    } catch (err) {
-      console.error("Logout failed:", err);
-    }
+    await logout();
   };
 
   return (

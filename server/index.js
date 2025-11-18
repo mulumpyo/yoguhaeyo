@@ -40,9 +40,9 @@ const app = fastify({
 if (!isProd) {
     try {
         customScalarCss = fs.readFileSync(SCALAR_CUSTOM_CSS_PATH, 'utf8');
-        app.log.info('Scalar custom CSS loaded successful');
+        console.log('Scalar custom CSS loaded successful');
     } catch (error) {
-        app.log.warn(`Failed to read custom CSS file at ${SCALAR_CUSTOM_CSS_PATH}: ${error.message}`);
+        console.log(`Failed to read custom CSS file at ${SCALAR_CUSTOM_CSS_PATH}: ${error.message}`);
     }
 }
 

@@ -36,28 +36,28 @@ export const data = {
   navMain: [
     { title: "대시보드", url: "/app", icon: SquareTerminal },
     { title: "테스트", url: "/app/test", icon: Bot },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        { title: "Introduction", url: "#" },
-        { title: "Get Started", url: "#" },
-        { title: "Tutorials", url: "#" },
-        { title: "Changelog", url: "#" },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        { title: "General", url: "#" },
-        { title: "Team", url: "#" },
-        { title: "Billing", url: "#" },
-        { title: "Limits", url: "#" },
-      ],
-    },
+    // {
+    //   title: "Documentation",
+    //   url: "#",
+    //   icon: BookOpen,
+    //   items: [
+    //     { title: "Introduction", url: "#" },
+    //     { title: "Get Started", url: "#" },
+    //     { title: "Tutorials", url: "#" },
+    //     { title: "Changelog", url: "#" },
+    //   ],
+    // },
+    // {
+    //   title: "Settings",
+    //   url: "#",
+    //   icon: Settings2,
+    //   items: [
+    //     { title: "General", url: "#" },
+    //     { title: "Team", url: "#" },
+    //     { title: "Billing", url: "#" },
+    //     { title: "Limits", url: "#" },
+    //   ],
+    // },
   ],
   project_menu: [
     { name: "Design Engineering", url: "#", icon: Frame },
@@ -75,7 +75,7 @@ const AppSidebarComponent = ({ user, ...props }) => {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.project_menu} />
+        {/* <NavProjects projects={data.project_menu} /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />
