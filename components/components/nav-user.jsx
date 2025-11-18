@@ -1,20 +1,14 @@
-"use client"
+"use client";
 
+import { useState, useEffect } from "react";
 import {
   Settings,
   Bell,
   MoreVertical,
-  CreditCard,
   LogOut,
-  Sparkles,
 } from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,29 +18,30 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 
 import { toast } from "sonner";
-
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-const NavUser = ({
-  user
-}) => {
+const NavUser = ({ user }) => {
   const { isMobile } = useSidebar();
   const router = useRouter();
 
-  if (!user) return null;
+  const [prevUser, setPrevUser] = useState(user);
+
+  useEffect(() => {
+    if (user) {
+      setPrevUser(user);
+    }
+  }, [user]);
+
+  const currentUser = prevUser;
+
+  if (!currentUser) return null;
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(`@${user.githubId}`);
+    await navigator.clipboard.writeText(`@${currentUser.githubId}`);
     toast.success("사용자 번호가 클립보드에 복사되었어요 :)");
   };
 
@@ -66,13 +61,14 @@ const NavUser = ({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer hover:bg-accent transition-colors duration-200">
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer hover:bg-accent transition-colors duration-200"
+            >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.username} />
-                <AvatarFallback className="rounded-lg"></AvatarFallback>
+                <AvatarImage src={currentUser.avatar} alt={currentUser.username} />
+                <AvatarFallback className="rounded-lg" />
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.username}</span>
+                <span className="truncate font-semibold">{currentUser.username}</span>
               </div>
               <MoreVertical className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -81,37 +77,27 @@ const NavUser = ({
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
             align="end"
-            sideOffset={4}>
+            sideOffset={4}
+          >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.username} />
-                  <AvatarFallback className="rounded-lg"></AvatarFallback>
+                  <AvatarImage src={currentUser.avatar} alt={currentUser.username} />
+                  <AvatarFallback className="rounded-lg" />
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.username}</span>
-                  <span 
+                  <span className="truncate font-semibold">{currentUser.username}</span>
+                  <span
                     className="truncate text-xs cursor-pointer text-gray-500 hover:text-accent-foreground transition-colors duration-200"
                     onClick={handleCopy}
                   >
-                    @{user.githubId}
+                    @{currentUser.githubId}
                   </span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {/* <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                플랜 업그레이드
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator /> */}
             <DropdownMenuGroup>
-              {/* <DropdownMenuItem>
-                <CreditCard />
-                결제
-              </DropdownMenuItem> */}
               <DropdownMenuItem>
                 <Bell />
                 알림
@@ -122,7 +108,7 @@ const NavUser = ({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} >
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               로그아웃
             </DropdownMenuItem>

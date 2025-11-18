@@ -23,55 +23,28 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
-const data = {
+export const data = {
   user: {
     name: "shadcn",
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
   projects: [
-    {
-      name: "thisisme",
-      description: "포트폴리오 플랫폼",
-    },
-    {
-      name: "yoguhaeyo",
-      description: "개발자 협업 도구",
-    },
+    { name: "thisisme", description: "포트폴리오 플랫폼" },
+    { name: "yoguhaeyo", description: "개발자 협업 도구" },
   ],
   navMain: [
-    {
-      title: "대시보드",
-      url: "/app",
-      icon: SquareTerminal,
-    },
-    {
-      title: "테스트",
-      url: "/app/test",
-      icon: Bot,
-    },
+    { title: "대시보드", url: "/app", icon: SquareTerminal },
+    { title: "테스트", url: "/app/test", icon: Bot },
     {
       title: "Documentation",
       url: "#",
       icon: BookOpen,
       items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
+        { title: "Introduction", url: "#" },
+        { title: "Get Started", url: "#" },
+        { title: "Tutorials", url: "#" },
+        { title: "Changelog", url: "#" },
       ],
     },
     {
@@ -79,48 +52,21 @@ const data = {
       url: "#",
       icon: Settings2,
       items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
+        { title: "General", url: "#" },
+        { title: "Team", url: "#" },
+        { title: "Billing", url: "#" },
+        { title: "Limits", url: "#" },
       ],
     },
   ],
   project_menu: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
+    { name: "Design Engineering", url: "#", icon: Frame },
+    { name: "Sales & Marketing", url: "#", icon: PieChart },
+    { name: "Travel", url: "#", icon: Map },
   ],
 };
 
-const AppSidebar = ({
-  user,
-  ...props
-}) => {
+const AppSidebarComponent = ({ user, ...props }) => {
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -137,6 +83,6 @@ const AppSidebar = ({
       <SidebarRail />
     </Sidebar>
   );
-}
+};
 
-export { AppSidebar };
+export const AppSidebar = React.memo(AppSidebarComponent);

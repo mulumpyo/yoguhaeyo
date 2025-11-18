@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import GithubLoginButton from '@/components/GithubLoginButton';
+import GithubLoginButton from '@/components/github-login-button';
 
 const MaxWidthWrapper = ({ children, className }) => (
   <div className={`mx-auto w-full max-w-7xl px-4 md:px-8 lg:px-12 ${className}`}>

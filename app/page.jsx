@@ -1,8 +1,8 @@
-import ScrollHeader from "@/components/ScrollHeader";
+import ScrollHeader from "@/components/scroll-header";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import GithubLoginButton from "@/components/GithubLoginButton"; 
+import GithubLoginButton from "@/components/github-login-button"; 
 import { Rocket, Star, ShieldCheck, Users } from "lucide-react";
-import Link from "next/link"; // Link component is necessary for navigation
+import Link from "next/link";
 
 export const revalidate = 0;
 
