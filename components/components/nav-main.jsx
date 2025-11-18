@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Collapsible,
   CollapsibleContent,
@@ -18,10 +19,19 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
   SidebarMenuSubButton,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 const NavMain = ({ items }) => {
   const pathname = usePathname();
+  const { setOpenMobile } = useSidebar();
+  const isMobile = useIsMobile();
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
     <SidebarGroup>
@@ -60,7 +70,7 @@ const NavMain = ({ items }) => {
                             asChild
                             className={isSubActive ? "bg-accent text-accent-foreground" : ""}
                           >
-                            <Link href={subItem.url}>
+                            <Link href={subItem.url} onClick={handleLinkClick}>
                               <span>{subItem.title}</span>
                             </Link>
                           </SidebarMenuSubButton>
@@ -80,7 +90,7 @@ const NavMain = ({ items }) => {
                 tooltip={item.title}
                 className={isActive ? "bg-accent text-accent-foreground" : ""}
               >
-                <Link href={item.url} className="flex items-center gap-2">
+                <Link href={item.url} className="flex items-center gap-2" onClick={handleLinkClick}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </Link>
