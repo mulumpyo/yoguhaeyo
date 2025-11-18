@@ -26,7 +26,7 @@ const proxy = async (req) => {
         return NextResponse.redirect(url);
       }
 
-      const response = NextResponse.redirect(new URL("/app", req.url));
+      const response = NextResponse.redirect(new URL(pathname, req.url));
 
       apiRes.headers.forEach((value, key) => {
         if (key.toLowerCase() === "set-cookie") {

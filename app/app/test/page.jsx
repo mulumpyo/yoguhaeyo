@@ -9,7 +9,7 @@ const TestPage = () => {
   useEffect(() => {
     const fetchTest = async () => {
       try {
-        const { data } = await api.get("/api/status/db");
+        const { data } = await api.get("/api/status/db", { withCredentials: true });
         setTest(data.serverTime);
       } catch (err) {
         console.error(err);
