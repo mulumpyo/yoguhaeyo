@@ -29,7 +29,7 @@ const NavUser = ({ user }) => {
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(`@${user.githubId}`);
-    toast.success("사용자 번호가 클립보드에 복사되었어요 :)");
+    toast.success("사용자 번호가 클립보드에 복사되었어요.");
   };
 
   const handleLogout = async () => {
