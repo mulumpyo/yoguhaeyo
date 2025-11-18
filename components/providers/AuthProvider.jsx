@@ -7,7 +7,6 @@ const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(undefined);
-  const [prevUser, setPrevUser] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -21,14 +20,8 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []);
 
-  useEffect(() => {
-    if (user !== undefined) {
-      setPrevUser(user);
-    }
-  }, [user]);
-
   return (
-    <AuthContext.Provider value={prevUser}>
+    <AuthContext.Provider value={user}>
       {children}
     </AuthContext.Provider>
   );

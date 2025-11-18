@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import {
   Settings,
   Bell,
@@ -28,20 +27,10 @@ const NavUser = ({ user }) => {
   const { isMobile } = useSidebar();
   const router = useRouter();
 
-  const [prevUser, setPrevUser] = useState(user);
-
-  useEffect(() => {
-    if (user) {
-      setPrevUser(user);
-    }
-  }, [user]);
-
-  const currentUser = prevUser;
-
-  if (!currentUser) return null;
+  if (!user) return null;
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(`@${currentUser.githubId}`);
+    await navigator.clipboard.writeText(`@${user.githubId}`);
     toast.success("사용자 번호가 클립보드에 복사되었어요 :)");
   };
 
@@ -64,11 +53,11 @@ const NavUser = ({ user }) => {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer hover:bg-accent transition-colors duration-200"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={currentUser.avatar} alt={currentUser.username} />
+                <AvatarImage src={user.avatar} alt={user.username} />
                 <AvatarFallback className="rounded-lg" />
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{currentUser.username}</span>
+                <span className="truncate font-semibold">{user.username}</span>
               </div>
               <MoreVertical className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -80,18 +69,18 @@ const NavUser = ({ user }) => {
             sideOffset={4}
           >
             <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+              <div className="flex items-center gap-2 px-1 py-1.5 text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={currentUser.avatar} alt={currentUser.username} />
+                  <AvatarImage src={user.avatar} alt={user.username} />
                   <AvatarFallback className="rounded-lg" />
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{currentUser.username}</span>
+                  <span className="truncate font-semibold">{user.username}</span>
                   <span
                     className="truncate text-xs cursor-pointer text-gray-500 hover:text-accent-foreground transition-colors duration-200"
                     onClick={handleCopy}
                   >
-                    @{currentUser.githubId}
+                    @{user.githubId}
                   </span>
                 </div>
               </div>

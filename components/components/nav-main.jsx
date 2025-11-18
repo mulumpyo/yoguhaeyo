@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
@@ -59,9 +60,9 @@ const NavMain = ({ items }) => {
                             asChild
                             className={isSubActive ? "bg-accent text-accent-foreground" : ""}
                           >
-                            <a href={subItem.url}>
+                            <Link href={subItem.url}>
                               <span>{subItem.title}</span>
-                            </a>
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       );
@@ -79,10 +80,10 @@ const NavMain = ({ items }) => {
                 tooltip={item.title}
                 className={isActive ? "bg-accent text-accent-foreground" : ""}
               >
-                <a href={item.url} className="flex items-center gap-2">
+                <Link href={item.url} className="flex items-center gap-2">
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           );
