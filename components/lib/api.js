@@ -1,9 +1,8 @@
 import axios from "axios";
 import { logout } from "./auth.js";
 
-
 const api = axios.create({
-  baseURL: process.env.BASE_URL,
+  baseURL: process.env.BASE_URL || "",
   withCredentials: true,
 });
 
@@ -13,9 +12,11 @@ let refreshPromise = null;
 const tryRefresh = async () => {
   if (!isRefreshing) {
     isRefreshing = true;
-    refreshPromise = api.post("/api/auth/refresh").finally(() => {
-      isRefreshing = false;
-    });
+    refreshPromise = api
+      .post("/api/auth/refresh", {}, { withCredentials: true })
+      .finally(() => {
+        isRefreshing = false;
+      });
   }
   return refreshPromise;
 };
