@@ -36,7 +36,7 @@ api.interceptors.response.use(
         return api(original);
       } catch (err) {
         await logout();
-        return Promise.reject(err);
+        return new Promise(() => {});
       }
     }
 
