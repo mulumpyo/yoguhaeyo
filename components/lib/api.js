@@ -17,7 +17,6 @@ const processQueue = (error, token = null) => {
       prom.resolve(token);
     }
   });
-
   failedQueue = [];
 };
 
@@ -28,13 +27,16 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (status === 401 && !originalRequest._retry) {
+
       if (isRefreshing) {
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
-          .then((token) => {
-            originalRequest.headers["Authorization"] = `Bearer ${token}`;
-            return api(originalRequest);
+          .then(() => {
+            return api({
+              ...originalRequest,
+              withCredentials: true,
+            });
           })
           .catch((err) => Promise.reject(err));
       }
@@ -49,12 +51,12 @@ api.interceptors.response.use(
           { withCredentials: true }
         );
 
-        const newToken = data?.accessToken;
-        api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+        processQueue(null, true);
 
-        processQueue(null, newToken);
-
-        return api(originalRequest);
+        return api({
+          ...originalRequest,
+          withCredentials: true,
+        });
       } catch (refreshError) {
         processQueue(refreshError, null);
         await logout();
