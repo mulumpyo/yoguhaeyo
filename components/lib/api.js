@@ -1,6 +1,7 @@
 import axios from "axios";
 import { logout } from "./auth.js";
 
+
 const api = axios.create({
   baseURL: process.env.BASE_URL,
   withCredentials: true,
@@ -33,7 +34,6 @@ api.interceptors.response.use(
 
         return api(original);
       } catch (err) {
-
         await logout();
         return Promise.reject(err);
       }
