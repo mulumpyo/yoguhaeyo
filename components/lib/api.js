@@ -6,36 +6,33 @@ const api = axios.create({
   withCredentials: true,
 });
 
-let isRefreshing = false;
-let refreshPromise = null;
-
-const tryRefresh = async () => {
-  if (!isRefreshing) {
-    isRefreshing = true;
-    refreshPromise = api
-      .post("/api/auth/refresh", {}, { withCredentials: true })
-      .finally(() => {
-        isRefreshing = false;
-      });
-  }
-  return refreshPromise;
-};
+let refreshTokenPromise = null;
 
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    const originalRequest = error.config;
     const status = error?.response?.status;
-    const original = error.config;
 
-    if (status === 401 && !original._retry) {
-      original._retry = true;
+    if (status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      if (!refreshTokenPromise) {
+        refreshTokenPromise = api
+          .post("/api/auth/refresh", {}, { withCredentials: true })
+          .finally(() => {
+            refreshTokenPromise = null;
+          });
+      }
 
       try {
-        await tryRefresh();
+        await refreshTokenPromise;
 
-        return api(original);
-      } catch (err) {
+        return api(originalRequest);
+      } catch (refreshError) {
+
         await logout();
+
         return new Promise(() => {});
       }
     }
