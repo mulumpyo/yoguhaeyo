@@ -11,7 +11,7 @@ const GithubLoginButton = ({ variant = "default", text = "GitHub 로그인", cNa
   return (
     <Button 
       onClick={handleLogin} 
-      className={`flex items-center gap-2 ${cName}`}
+      className={`flex items-center gap-2 cursor-pointer ${cName}`}
       variant={variant}
     >
       <SiGithub className="h-4 w-4" /> 
