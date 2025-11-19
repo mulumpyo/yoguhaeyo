@@ -19,8 +19,8 @@ export const authService = {
     const githubUser = await githubProvider.getUserInfo(accessToken);
 
     // DB upsert
-    const userRow = await authRepository.upsertUserAndSelectAssignRole(app, githubUser);
-    const user = authMapper.mapUserFromDbRow(userRow);
+    await authRepository.upsertUserAndAssignRole(app, githubUser);
+    const user = await authMapper.selectUserByGithubId(app, githubUser.id);
     if (!user) throw { status: 401, message: "User not found after upsert" };
 
     // accseeToken 토큰 생성

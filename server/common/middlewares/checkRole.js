@@ -7,6 +7,8 @@ export const checkRole = (requiredRoles) => async (req, reply) => {
     userRoles.includes(requiredRole)
   );
 
+  console.log(userRoles);
+
   if (!hasPermission) {
     const errorMessage = `접근 권한이 없습니다.`;
       return reply.code(403).send({ 

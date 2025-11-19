@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { toast } from "sonner";
 import api from "@/lib/api";
 
 const TestPage = () => {
@@ -10,10 +9,10 @@ const TestPage = () => {
   useEffect(() => {
     const fetchTest = async () => {
       try {
-        const { data } = await api.get("/api/status/db", { withCredentials: true });
+        const { data } = await api.get("/api/status/db");
         setTest(data.serverTime);
       } catch (err) {
-        toast.error("데이터를 불러오는 도중 실패하였습니다.",);
+        setTest(null);
       }
     };
 

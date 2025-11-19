@@ -36,18 +36,6 @@ BEGIN
     -- 커밋
     COMMIT;
 
-    -- 4. 최종적으로 할당된 사용자 정보와 역할
-    SELECT
-        u.github_id,
-        u.username,
-        u.avatar,
-        r.name AS role_name
-    FROM users u
-    LEFT JOIN user_roles ur ON u.github_id = ur.github_id
-    LEFT JOIN roles r ON ur.role_id = r.role_id
-    WHERE u.github_id = p_github_id
-    LIMIT 1;
-
 END //
 
 DELIMITER ;
