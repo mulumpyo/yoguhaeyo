@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
-
+import { getIcon } from "@/lib/icon-map";
 import { useIsMobile } from "@/hooks/use-mobile";
+
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -28,9 +30,7 @@ const NavMain = ({ items }) => {
   const isMobile = useIsMobile();
 
   const handleLinkClick = () => {
-    if (isMobile) {
-      setOpenMobile(false);
-    }
+    if (isMobile) setOpenMobile(false);
   };
 
   return (
@@ -38,40 +38,41 @@ const NavMain = ({ items }) => {
       <SidebarGroupLabel>홈</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
-          const isActive = item.url === pathname || item.items?.some(sub => sub.url === pathname);
+          const Icon = getIcon(item.icon_name);
+          const isActive =
+            item.url === pathname ||
+            item.items?.some((sub) => sub.url === pathname);
 
-          return item.items && item.items.length > 0 ? (
+          const hasChildren = !!item.items?.length;
 
-            // 하위 메뉴 있는 경우
-            <Collapsible
-              key={item.title}
-              asChild
-              defaultOpen={isActive}
-              className="group/collapsible"
-            >
+          return hasChildren ? (
+            <Collapsible key={item.id ?? item.url} asChild defaultOpen={isActive}>
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton
-                    tooltip={item.title}
                     className={isActive ? "bg-accent text-accent-foreground" : ""}
                   >
-                    {item.icon && <item.icon />}
+                    {Icon && <Icon className="mr-2 h-4 w-4" />}
                     <span>{item.title}</span>
                     <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
+
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     {item.items.map((subItem) => {
+                      const SubIcon = getIcon(subItem.icon_name);
                       const isSubActive = subItem.url === pathname;
+
                       return (
-                        <SidebarMenuSubItem key={subItem.title}>
+                        <SidebarMenuSubItem key={subItem.id ?? subItem.url}>
                           <SidebarMenuSubButton
                             asChild
                             className={isSubActive ? "bg-accent text-accent-foreground" : ""}
                           >
                             <Link href={subItem.url} onClick={handleLinkClick}>
-                              <span>{subItem.title}</span>
+                              {SubIcon && <SubIcon className="mr-2 h-4 w-4" />}
+                              {subItem.title}
                             </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
@@ -82,17 +83,14 @@ const NavMain = ({ items }) => {
               </SidebarMenuItem>
             </Collapsible>
           ) : (
-
-            // 하위 메뉴 없는 경우
-            <SidebarMenuItem key={item.title}>
+            <SidebarMenuItem key={item.id ?? item.url}>
               <SidebarMenuButton
                 asChild
-                tooltip={item.title}
                 className={isActive ? "bg-accent text-accent-foreground" : ""}
               >
-                <Link href={item.url} className="flex items-center gap-2" onClick={handleLinkClick}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+                <Link href={item.url || pathname} onClick={handleLinkClick}>
+                  {Icon && <Icon className="mr-2 h-4 w-4" />}
+                  {item.title}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

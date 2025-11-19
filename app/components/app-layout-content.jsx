@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { AppSidebar, data } from "./app-sidebar";
+import { AppSidebar, dummy } from "./app-sidebar";
 import { useAuth } from "@/providers/AuthProvider";
 
 export const AppLayoutContent = ({ children }) => {
@@ -12,10 +12,10 @@ export const AppLayoutContent = ({ children }) => {
   const user = useAuth();
 
   const findPageTitle = () => {
-    const exactMatch = data.navMain.find((item) => item.url === pathname);
+    const exactMatch = dummy.navMain.find((item) => item.url === pathname);
     if (exactMatch) return exactMatch.title;
 
-    const partialMatch = data.navMain.find(
+    const partialMatch = dummmy.navMain.find(
       (item) => pathname.startsWith(item.url) && item.url !== "#"
     );
     if (partialMatch) return partialMatch.title;
@@ -55,4 +55,4 @@ export const AppLayoutContent = ({ children }) => {
       </SidebarInset>
     </SidebarProvider>
   );
-};
+}

@@ -1,6 +1,8 @@
 "use client"
 
-import * as React from "react";
+import { useState, useEffect, memo } from "react";
+import api from "@/lib/api";
+
 import {
   BookOpen,
   Bot,
@@ -23,7 +25,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-export const data = {
+export const dummy = {
   user: {
     name: "shadcn",
     email: "m@example.com",
@@ -68,13 +70,28 @@ export const data = {
 
 const AppSidebarComponent = ({ user, ...props }) => {
 
+  const [menu, setMenu] = useState([]);
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        const { data } = await api.get("/api/menu/sidebar-menu");
+        setMenu(data);
+      } catch (err) {
+        setMenu([]);
+      }
+    };
+
+    fetchMenu();
+  }, []);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <ProjectSwitcher projects={data.projects} />
+        <ProjectSwitcher projects={dummy.projects} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={menu} />
         {/* <NavProjects projects={data.project_menu} /> */}
       </SidebarContent>
       <SidebarFooter>
@@ -85,4 +102,4 @@ const AppSidebarComponent = ({ user, ...props }) => {
   );
 };
 
-export const AppSidebar = React.memo(AppSidebarComponent);
+export const AppSidebar = memo(AppSidebarComponent);
