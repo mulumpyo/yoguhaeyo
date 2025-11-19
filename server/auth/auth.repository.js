@@ -1,16 +1,12 @@
 export const authRepository = {
 
   upsertUserAndSelectAssignRole: async (app, githubUser) => {
-      const procSql = `
-        CALL proc_upsert_user_and_assign_role(?, ?, ?);
-      `;
+      const procSql = `CALL proc_upsert_user_and_assign_role(?, ?, ?);`;
       const procParams = [githubUser.id, githubUser.login, githubUser.avatar_url];
       
-      await app.mysql.pool.query(procSql, procParams);
+      const [rows] = await app.mysql.pool.query(procSql, procParams);
       
-      const userRow = await authRepository.selectUserByGithubId(app, githubUser.id);
-      
-      return userRow;
+      return rows[0] ?? null;
   },
 
   selectUserByGithubId: async (app, githubId) => {
