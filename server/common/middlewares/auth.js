@@ -7,7 +7,16 @@ export const verifyToken = async (req, reply) => {
     }
 
     const decoded = await req.server.jwt.verify(token);
-    req.user = decoded;
+    
+    let roles = [];
+    if (decoded.role) {
+      roles = Array.isArray(decoded.role) ? decoded.role : [decoded.role];
+    }
+
+    req.user = {
+      githubId: decoded.githubId,
+      role: roles,
+    };
   } catch (err) {
     return reply.code(401).send({ error: "Invalid token" });
   }

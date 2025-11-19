@@ -3,13 +3,20 @@ import { authRepository } from "./auth.repository.js";
 export const authMapper = {
 
   /**
-   * 사원 정보 추가 또는 업데이트
-   * @description 사용자 정보를 추가하거나 이미 정보가 존재할 경우 업데이트
+   * DB에서 조회한 사용자 정보를 기반으로 사용자 객체를 생성
+   * @param {object} userRow 
+   * @returns 
    */
-  upsertUserAndSelectAssignRole: async (app, githubUser) => {
-    return await authRepository.upsertUserAndSelectAssignRole(app, githubUser);
-  },
+  mapUserFromDbRow: (userRow) => {
+    if (!userRow) return null;
 
+    return {
+      githubId: userRow.github_id,
+      username: userRow.username,
+      avatar: userRow.avatar,
+      role: userRow.role_name ?? "user",
+    };
+  },
 
   /**
    * 사용자 존재 여부 확인
@@ -18,15 +25,7 @@ export const authMapper = {
    */
   selectUserByGithubId: async (app, githubId) => {
     const userRow = await authRepository.selectUserByGithubId(app, githubId);
-
-    if (!userRow) return null;
-
-    return {
-      githubId: userRow.github_id,
-      username: userRow.username,
-      avatar: userRow.avatar,
-      role: userRow.role ?? "user",
-    };
+    return authMapper.mapUserFromDbRow(userRow);
   },
 
 };

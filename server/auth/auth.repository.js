@@ -7,9 +7,10 @@ export const authRepository = {
       const procParams = [githubUser.id, githubUser.login, githubUser.avatar_url];
       
       await app.mysql.pool.query(procSql, procParams);
-      const user = await authRepository.selectUserByGithubId(app, githubUser.id);
       
-      return user;
+      const userRow = await authRepository.selectUserByGithubId(app, githubUser.id);
+      
+      return userRow;
   },
 
   selectUserByGithubId: async (app, githubId) => {
@@ -20,8 +21,8 @@ export const authRepository = {
           u.avatar,
           r.name AS role_name
       FROM users u
-      JOIN user_roles ur ON u.github_id = ur.github_id
-      JOIN roles r ON ur.role_id = r.role_id
+      LEFT JOIN user_roles ur ON u.github_id = ur.github_id
+      LEFT JOIN roles r ON ur.role_id = r.role_id
       WHERE u.github_id = ?
       LIMIT 1
     `;

@@ -1,4 +1,5 @@
 import { authMapper } from "./auth.mapper.js";
+import { authRepository } from "./auth.repository.js";
 import { githubProvider } from "../common/providers/github.provider.js";
 import { jwtProvider } from "../common/providers/jwt.provider.js";
 import { refreshTokenProvider } from "../common/providers/refreshToken.provider.js";
@@ -18,12 +19,14 @@ export const authService = {
     const githubUser = await githubProvider.getUserInfo(accessToken);
 
     // DB upsert
-    const user = await authMapper.upsertUserAndSelectAssignRole(app, githubUser);
+    const userRow = await authRepository.upsertUserAndSelectAssignRole(app, githubUser);
+    const user = authMapper.mapUserFromDbRow(userRow);
     if (!user) throw { status: 401, message: "User not found after upsert" };
 
     // accseeToken 토큰 생성
     const jwtToken = jwtProvider.signAccessToken(app, {
       githubId: Number(githubUser.id),
+      role: user.role,
     });
 
     // refreshToken 생성
@@ -59,6 +62,7 @@ export const authService = {
 
     const newAccessToken = jwtProvider.signAccessToken(app, {
       githubId: Number(githubId),
+      role: user.role,
     });
 
     reply.setCookie("access_token", newAccessToken, {

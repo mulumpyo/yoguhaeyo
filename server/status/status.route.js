@@ -1,9 +1,10 @@
 import { statusController } from "./status.controller.js";
 import { verifyToken } from "../common/middlewares/auth.js";
+import { checkRole } from "../common/middlewares/checkRole.js";
 
 // Route 공통
 const createRouteOptions = ({ summary, description, response }) => ({
-  preHandler: verifyToken,
+  preHandler: [verifyToken, checkRole(["super"])],
   schema: {
     tags: ["상태"],
     summary,
@@ -26,6 +27,21 @@ const statusRoutes = async (app) => {
           type: "object",
           properties: {
             serverTime: { type: "string", example: "2025-11-14 09:17:04" },
+          },
+        },
+        401: {
+          description: "로그인 필요",
+          type: "object",
+          properties: {
+            error: { type: "string", example: "Unauthorized" },
+          },
+        },
+        403: {
+          description: "권한 없음",
+          type: "object",
+          properties: {
+            error: { type: "string", example: "Forbidden" },
+            message: { type: "string", example: "접근 권한이 없습니다." },
           },
         },
         500: {
@@ -52,6 +68,21 @@ const statusRoutes = async (app) => {
           type: "object",
           properties: {
             status: { type: "string", example: "PONG" },
+          },
+        },
+        401: {
+          description: "로그인 필요",
+          type: "object",
+          properties: {
+            error: { type: "string", example: "Unauthorized" },
+          },
+        },
+        403: {
+          description: "권한 없음",
+          type: "object",
+          properties: {
+            error: { type: "string", example: "Forbidden" },
+            message: { type: "string", example: "접근 권한이 없습니다." },
           },
         },
         500: {
