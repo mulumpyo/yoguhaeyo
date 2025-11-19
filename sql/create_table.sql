@@ -15,6 +15,8 @@ DROP TABLE IF EXISTS `project_roles`;
 DROP TABLE IF EXISTS `projects`;
 DROP TABLE IF EXISTS `roles`;
 DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `menus`;
+DROP TABLE IF EXISTS `menu_permissions`;
 
 SET FOREIGN_KEY_CHECKS = 1;
 SET FOREIGN_KEY_CHECKS = 1;
@@ -67,6 +69,17 @@ CREATE TABLE `project_permissions` (
 	`description`	VARCHAR(512)	NULL
 );
 
+-- 메뉴 테이블
+CREATE TABLE `menus` (
+	`menu_id`	BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT	NOT NULL,
+	`parent_id`	BIGINT UNSIGNED	NULL	COMMENT '상위 메뉴 ID (최상위는 NULL)',
+	`title`	VARCHAR(255)	NOT NULL,
+	`url`	VARCHAR(512)	NULL	COMMENT '라우팅 경로',
+	`icon_name`	VARCHAR(100)	NULL,
+	`menu_order`	INT	NOT NULL	DEFAULT 0	COMMENT '동일 레벨 내 표시 순서',
+	`type`	ENUM('GLOBAL', 'PROJECT')	NOT NULL	DEFAULT 'GLOBAL'
+);
+
 -- 사용자 ↔ 전역 역할 매핑
 CREATE TABLE `user_roles` (
 	`github_id`	BIGINT UNSIGNED	NOT NULL	COMMENT 'GitHub 계정 고유 식별 번호 (FK)',
@@ -96,6 +109,14 @@ CREATE TABLE `project_members` (
 	PRIMARY KEY (`project_id`, `member_id`)
 );
 
+-- 메뉴 ↔ 권한 매핑
+CREATE TABLE `menu_permissions` (
+	`menu_id`	BIGINT UNSIGNED	NOT NULL,
+	`perm_type`	ENUM('GLOBAL', 'PROJECT')	NOT NULL,
+	`perm_ref_id`	BIGINT UNSIGNED	NOT NULL	COMMENT 'permissions.perm_id 또는 project_permissions.proj_perm_id',
+    PRIMARY KEY (`menu_id`, `perm_type`, `perm_ref_id`)
+);
+
 -- 전역 역할 매핑
 ALTER TABLE `user_roles` ADD CONSTRAINT `FK_users_TO_user_roles_1` FOREIGN KEY (`github_id`) REFERENCES `users` (`github_id`) ON DELETE CASCADE;
 ALTER TABLE `user_roles` ADD CONSTRAINT `FK_roles_TO_user_roles_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE;
@@ -115,3 +136,9 @@ ALTER TABLE `project_role_permissions` ADD CONSTRAINT `FK_project_permissions_TO
 ALTER TABLE `project_members` ADD CONSTRAINT `FK_projects_TO_project_members_1` FOREIGN KEY (`project_id`) REFERENCES `projects` (`project_id`) ON DELETE CASCADE;
 ALTER TABLE `project_members` ADD CONSTRAINT `FK_users_TO_project_members_1` FOREIGN KEY (`member_id`) REFERENCES `users` (`github_id`) ON DELETE CASCADE;
 ALTER TABLE `project_members` ADD CONSTRAINT `FK_project_roles_TO_project_members_1` FOREIGN KEY (`proj_role_id`) REFERENCES `project_roles` (`proj_role_id`) ON DELETE RESTRICT;
+
+-- 메뉴 계층 구조 (Self-Reference)
+ALTER TABLE `menus` ADD CONSTRAINT `FK_menus_self_reference_1` FOREIGN KEY (`parent_id`) REFERENCES `menus` (`menu_id`) ON DELETE CASCADE;
+
+-- 메뉴 ↔ 권한 매핑
+ALTER TABLE `menu_permissions` ADD CONSTRAINT `FK_menus_TO_menu_permissions_1` FOREIGN KEY (`menu_id`)REFERENCES `menus` (`menu_id`) ON DELETE CASCADE;

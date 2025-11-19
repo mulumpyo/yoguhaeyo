@@ -3,8 +3,8 @@ import { verifyToken } from "../common/middlewares/auth.js";
 import { checkRole } from "../common/middlewares/checkRole.js";
 
 // Route 공통
-const createRouteOptions = ({ summary, description, response }) => ({
-  preHandler: [verifyToken, checkRole(["super"])],
+const createRouteOptions = ({ summary, description, response, roles = ["super"] }) => ({
+  preHandler: [verifyToken, checkRole(roles)],
   schema: {
     tags: ["상태"],
     summary,

@@ -1,7 +1,7 @@
 export const authRepository = {
 
   upsertUserAndAssignRole: async (app, githubUser) => {
-    const procSql = `CALL proc_upsert_user_and_assign_role(?, ?, ?);`;
+    const procSql = `CALL proc_upsert_user_and_assign_role(?, ?, ?)`;
     const procParams = [githubUser.id, githubUser.login, githubUser.avatar_url];
     
     await app.mysql.pool.query(procSql, procParams);
