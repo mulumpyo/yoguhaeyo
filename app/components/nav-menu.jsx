@@ -24,7 +24,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const NavMenu = ({ items }) => {
+const NavMenu = ({ group }) => {
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
@@ -35,18 +35,24 @@ const NavMenu = ({ items }) => {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>홈</SidebarGroupLabel>
+      <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+
       <SidebarMenu>
-        {items.map((item) => {
+        {group.items.map((item) => {
           const Icon = getIcon(item.icon_name);
           const isActive =
             item.url === pathname ||
             item.items?.some((sub) => sub.url === pathname);
 
-          const hasChildren = !!item.items?.length;
+          const hasChildren = item.items && item.items.length > 0;
 
           return hasChildren ? (
-            <Collapsible key={item.id ?? item.url} asChild defaultOpen={isActive} className="group/collapsible" >
+            <Collapsible
+              key={item.menu_id}
+              asChild
+              defaultOpen={isActive}
+              className="group/collapsible"
+            >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton
@@ -60,19 +66,21 @@ const NavMenu = ({ items }) => {
 
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {item.items.map((subItem) => {
-                      const SubIcon = getIcon(subItem.icon_name);
-                      const isSubActive = subItem.url === pathname;
+                    {item.items.map((sub) => {
+                      const SubIcon = getIcon(sub.icon_name);
+                      const isSubActive = sub.url === pathname;
 
                       return (
-                        <SidebarMenuSubItem key={subItem.id ?? subItem.url}>
+                        <SidebarMenuSubItem key={sub.menu_id}>
                           <SidebarMenuSubButton
                             asChild
-                            className={isSubActive ? "bg-accent text-accent-foreground" : ""}
+                            className={
+                              isSubActive ? "bg-accent text-accent-foreground" : ""
+                            }
                           >
-                            <Link href={subItem.url} onClick={handleLinkClick}>
+                            <Link href={sub.url} onClick={handleLinkClick}>
                               {SubIcon && <SubIcon className="mr-2 h-4 w-4" />}
-                              {subItem.title}
+                              {sub.title}
                             </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
@@ -83,7 +91,7 @@ const NavMenu = ({ items }) => {
               </SidebarMenuItem>
             </Collapsible>
           ) : (
-            <SidebarMenuItem key={item.id ?? item.url}>
+            <SidebarMenuItem key={item.menu_id}>
               <SidebarMenuButton
                 asChild
                 className={isActive ? "bg-accent text-accent-foreground" : ""}

@@ -3,14 +3,6 @@
 import { useState, useEffect, memo } from "react";
 import api from "@/lib/api";
 
-import {
-  Bot,
-  Frame,
-  Map,
-  PieChart,
-  SquareTerminal,
-} from "lucide-react";
-
 import { NavMenu } from "@/components/nav-menu";
 import { NavUser } from "@/components/nav-user";
 import { ProjectSwitcher } from "@/components/project-switcher";
@@ -32,41 +24,9 @@ export const dummy = {
     { name: "thisisme", description: "포트폴리오 플랫폼" },
     { name: "yoguhaeyo", description: "개발자 협업 도구" },
   ],
-  navMain: [
-    { title: "대시보드", url: "/app", icon: SquareTerminal },
-    { title: "테스트", url: "/app/test", icon: Bot },
-    // {
-    //   title: "Documentation",
-    //   url: "#",
-    //   icon: BookOpen,
-    //   items: [
-    //     { title: "Introduction", url: "#" },
-    //     { title: "Get Started", url: "#" },
-    //     { title: "Tutorials", url: "#" },
-    //     { title: "Changelog", url: "#" },
-    //   ],
-    // },
-    // {
-    //   title: "Settings",
-    //   url: "#",
-    //   icon: Settings2,
-    //   items: [
-    //     { title: "General", url: "#" },
-    //     { title: "Team", url: "#" },
-    //     { title: "Billing", url: "#" },
-    //     { title: "Limits", url: "#" },
-    //   ],
-    // },
-  ],
-  project_menu: [
-    { name: "Design Engineering", url: "#", icon: Frame },
-    { name: "Sales & Marketing", url: "#", icon: PieChart },
-    { name: "Travel", url: "#", icon: Map },
-  ],
 };
 
-const AppSidebarComponent = ({ user, ...props }) => {
-
+const AppSidebarComponent = ({ user, onMenuLoaded, ...props }) => {
   const [menu, setMenu] = useState([]);
 
   useEffect(() => {
@@ -74,8 +34,11 @@ const AppSidebarComponent = ({ user, ...props }) => {
       try {
         const { data } = await api.get("/api/menu/sidebar-menu");
         setMenu(data);
+
+        onMenuLoaded?.(data);
       } catch (err) {
         setMenu([]);
+        onMenuLoaded?.([]);
       }
     };
 
@@ -87,12 +50,17 @@ const AppSidebarComponent = ({ user, ...props }) => {
       <SidebarHeader>
         <ProjectSwitcher projects={dummy.projects} />
       </SidebarHeader>
+
       <SidebarContent>
-        <NavMenu items={menu} />
+        {menu.map((group, idx) => (
+          <NavMenu key={`${group.title}-${idx}`} group={group} />
+        ))}
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser user={user} />
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );

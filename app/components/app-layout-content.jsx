@@ -1,33 +1,70 @@
 "use client"
 
+import { useState, useMemo } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { AppSidebar, dummy } from "./app-sidebar";
+import { AppSidebar } from "./app-sidebar";
 import { useAuth } from "@/providers/AuthProvider";
+
+const findBreadcrumbInfo = (menu, pathname) => {
+  const matches = [];
+
+  for (const group of menu) {
+    for (const item of group.items) {
+
+      if (pathname.startsWith(item.url)) {
+        matches.push({
+          group: { title: group.title },
+          parent: null,
+          current: { title: item.title, url: item.url },
+          len: item.url.length,
+        });
+      }
+
+      if (item.items) {
+        for (const sub of item.items) {
+          if (pathname.startsWith(sub.url)) {
+            matches.push({
+              group: { title: group.title },
+              parent: { title: item.title, url: item.url },
+              current: { title: sub.title, url: sub.url },
+              len: sub.url.length,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  if (matches.length === 0) return null;
+
+
+  matches.sort((a, b) => b.len - a.len);
+
+  return matches[0];
+};
+
 
 export const AppLayoutContent = ({ children }) => {
   const pathname = usePathname();
   const user = useAuth();
+  const [menuData, setMenuData] = useState([]);
 
-  const findPageTitle = () => {
-    const exactMatch = dummy.navMain.find((item) => item.url === pathname);
-    if (exactMatch) return exactMatch.title;
-
-    const partialMatch = dummmy.navMain.find(
-      (item) => pathname.startsWith(item.url) && item.url !== "#"
-    );
-    if (partialMatch) return partialMatch.title;
-
-    return "페이지";
-  };
-
-  const pageTitle = findPageTitle();
+  const breadcrumb = useMemo(() => findBreadcrumbInfo(menuData, pathname), [menuData, pathname]);
 
   return (
     <SidebarProvider>
-      <AppSidebar user={user} />
+      <AppSidebar user={user} onMenuLoaded={setMenuData} />
 
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 bg-gray-50">
@@ -37,13 +74,31 @@ export const AppLayoutContent = ({ children }) => {
 
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink>홈</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{pageTitle}</BreadcrumbPage>
-                </BreadcrumbItem>
+                {breadcrumb ? (
+                  <>
+                    <BreadcrumbItem className="hidden md:block">
+                      <BreadcrumbLink>{breadcrumb.group.title}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="hidden md:block" />
+
+                    {breadcrumb.parent && (
+                      <>
+                        <BreadcrumbItem className="hidden md:block">
+                          <BreadcrumbLink>{breadcrumb.parent.title}</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator className="hidden md:block" />
+                      </>
+                    )}
+
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>{breadcrumb.current.title}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>
+                ) : (
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>홈</BreadcrumbPage>
+                  </BreadcrumbItem>
+                )}
               </BreadcrumbList>
             </Breadcrumb>
           </div>
@@ -55,4 +110,4 @@ export const AppLayoutContent = ({ children }) => {
       </SidebarInset>
     </SidebarProvider>
   );
-}
+};
