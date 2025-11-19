@@ -38,7 +38,7 @@ export const AppLayoutContent = ({ children }) => {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/app">홈</BreadcrumbLink>
+                  <BreadcrumbLink>홈</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>

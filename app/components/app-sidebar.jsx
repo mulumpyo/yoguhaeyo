@@ -4,17 +4,14 @@ import { useState, useEffect, memo } from "react";
 import api from "@/lib/api";
 
 import {
-  BookOpen,
   Bot,
   Frame,
   Map,
   PieChart,
-  Settings2,
   SquareTerminal,
 } from "lucide-react";
 
-import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
+import { NavMenu } from "@/components/nav-menu";
 import { NavUser } from "@/components/nav-user";
 import { ProjectSwitcher } from "@/components/project-switcher";
 import {
@@ -91,8 +88,7 @@ const AppSidebarComponent = ({ user, ...props }) => {
         <ProjectSwitcher projects={dummy.projects} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={menu} />
-        {/* <NavProjects projects={data.project_menu} /> */}
+        <NavMenu items={menu} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

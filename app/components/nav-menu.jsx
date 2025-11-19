@@ -24,7 +24,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const NavMain = ({ items }) => {
+const NavMenu = ({ items }) => {
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
@@ -101,4 +101,4 @@ const NavMain = ({ items }) => {
   );
 };
 
-export { NavMain };
+export { NavMenu };
