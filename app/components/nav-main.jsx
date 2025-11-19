@@ -46,7 +46,7 @@ const NavMain = ({ items }) => {
           const hasChildren = !!item.items?.length;
 
           return hasChildren ? (
-            <Collapsible key={item.id ?? item.url} asChild defaultOpen={isActive}>
+            <Collapsible key={item.id ?? item.url} asChild defaultOpen={isActive} className="group/collapsible" >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton
