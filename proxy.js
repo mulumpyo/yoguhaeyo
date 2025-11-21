@@ -23,7 +23,12 @@ const proxy = async (req) => {
 
       if (!apiRes.ok) {
         url.pathname = "/";
-        return NextResponse.redirect(url);
+        const response = NextResponse.redirect(url);
+
+        response.cookies.delete("access_token");
+        response.cookies.delete("refresh_token");
+        
+        return response;
       }
 
       const response = NextResponse.redirect(new URL(pathname, req.url));
@@ -35,9 +40,16 @@ const proxy = async (req) => {
       });
 
       return response;
+
     } catch (err) {
+      console.error("Middleware Refresh Error:", err);
       url.pathname = "/";
-      return NextResponse.redirect(url);
+      const response = NextResponse.redirect(url);
+      
+      response.cookies.delete("access_token");
+      response.cookies.delete("refresh_token");
+      
+      return response;
     }
   }
 
