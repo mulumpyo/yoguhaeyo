@@ -6,40 +6,63 @@ CREATE PROCEDURE `proc_filtered_menu_tree` (
     IN p_github_id BIGINT UNSIGNED
 )
 BEGIN
-    -- 1. 사용자 권한을 임시 테이블에 취합
-    CREATE TEMPORARY TABLE IF NOT EXISTS UserPerms (
-        perm_type ENUM('GLOBAL', 'PROJECT'),
-        perm_ref_id BIGINT UNSIGNED,
-        PRIMARY KEY (perm_type, perm_ref_id)
-    );
-    
-    -- 기존의 UNION 쿼리 결과를 임시 테이블에 삽입
-    INSERT INTO UserPerms (perm_type, perm_ref_id)
-    SELECT 'GLOBAL', T4.perm_id
-    FROM user_roles AS T2
-    JOIN role_permissions AS T3 ON T2.role_id = T3.role_id
-    JOIN permissions AS T4 ON T3.perm_id = T4.perm_id
-    WHERE T2.github_id = p_github_id
-    
-    UNION
-    
-    SELECT 'PROJECT', T4.proj_perm_id
-    FROM project_members AS T2
-    JOIN project_role_permissions AS T3 ON T2.proj_role_id = T3.proj_role_id
-    JOIN project_permissions AS T4 ON T3.proj_perm_id = T4.proj_perm_id
-    WHERE T2.member_id = p_github_id;
+    DECLARE v_is_super BOOLEAN DEFAULT FALSE;
 
-    -- 2. 임시 테이블을 사용하여 메뉴 필터링
-    SELECT DISTINCT
-        T1.menu_id, T1.parent_id, T1.title, T1.url, T1.icon_name, T1.menu_order
-    FROM menus AS T1
-    JOIN menu_permissions AS T2 ON T1.menu_id = T2.menu_id
-    JOIN UserPerms AS UP ON T2.perm_type = UP.perm_type AND T2.perm_ref_id = UP.perm_ref_id
-    ORDER BY T1.menu_order ASC;
-    
-    -- 임시 테이블 정리
+    -- 0. 안전을 위해 임시 테이블이 남아있다면 먼저 삭제
     DROP TEMPORARY TABLE IF EXISTS UserPerms;
-    
+
+    -- 1. Super Admin 여부 확인
+    SELECT COUNT(*) > 0 INTO v_is_super
+    FROM user_roles ur
+    JOIN roles r ON ur.role_id = r.role_id
+    WHERE ur.github_id = p_github_id 
+      AND r.name = 'super';
+
+    -- 2. 분기 처리
+    IF v_is_super THEN
+        -- [A] Super Admin이면: 권한 검사 없이 '모든 메뉴' 반환
+        SELECT 
+            menu_id, parent_id, title, url, icon_name, menu_order
+        FROM menus
+        ORDER BY menu_order ASC;
+        
+    ELSE
+        -- [B] 일반 사용자면: 권한 필터링 로직 수행
+        
+        -- 2-1. 사용자 권한 취합을 위한 임시 테이블 생성
+        CREATE TEMPORARY TABLE UserPerms (
+            perm_type ENUM('GLOBAL', 'PROJECT'),
+            perm_ref_id BIGINT UNSIGNED,
+            PRIMARY KEY (perm_type, perm_ref_id)
+        );
+
+        -- 2-2. GLOBAL 권한 취합 (자신의 역할 -> 권한)
+        INSERT INTO UserPerms (perm_type, perm_ref_id)
+        SELECT 'GLOBAL', rp.perm_id
+        FROM user_roles ur
+        JOIN role_permissions rp ON ur.role_id = rp.role_id
+        WHERE ur.github_id = p_github_id;
+
+        -- 2-3. PROJECT 권한 취합
+        INSERT INTO UserPerms (perm_type, perm_ref_id)
+        SELECT DISTINCT 'PROJECT', prp.proj_perm_id
+        FROM project_members pm
+        JOIN project_role_permissions prp ON pm.proj_role_id = prp.proj_role_id
+        WHERE pm.member_id = p_github_id; 
+
+        -- 2-4. 메뉴 필터링 및 조회
+        SELECT DISTINCT
+            m.menu_id, m.parent_id, m.title, m.url, m.icon_name, m.menu_order
+        FROM menus m
+        JOIN menu_permissions mp ON m.menu_id = mp.menu_id
+        JOIN UserPerms up ON mp.perm_type = up.perm_type AND mp.perm_ref_id = up.perm_ref_id
+        ORDER BY m.menu_order ASC;
+
+        -- 2-5. 임시 테이블 정리
+        DROP TEMPORARY TABLE UserPerms;
+        
+    END IF;
+
 END //
 
 DELIMITER ;
