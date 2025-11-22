@@ -7,7 +7,8 @@ INSERT INTO `permissions` (`perm_id`, `name`, `description`) VALUES
 (1, 'role:manage', '전역 역할 기준 정보 생성/수정/삭제 권한'),
 (2, 'permission:manage', '전역 권한 기준 정보 생성/수정/삭제 권한'),
 (3, 'user:read_any', '모든 사용자의 계정 정보를 열람할 수 있음'),
-(4, 'user:suspend', '사용자 계정을 정지시키거나 복구할 수 있음');
+(4, 'user:suspend', '사용자 계정을 정지시키거나 복구할 수 있음'),
+(5, 'menu:manage', '사이드바 메뉴 순서, 추가, 삭제 등 메뉴 관련 모든 관리 권한');
 
 -- 1-2. 전역 역할 (`roles`)
 INSERT INTO `roles` (`role_id`, `name`, `description`) VALUES
@@ -36,7 +37,7 @@ INSERT INTO `project_permissions` (`proj_perm_id`, `name`, `description`) VALUES
 
 -- Super Admin (role_id = 1): 모든 전역 관리 권한 부여 (1~4)
 INSERT INTO `role_permissions` (`role_id`, `perm_id`) VALUES
-(1, 1), (1, 2), (1, 3), (1, 4);
+(1, 1), (1, 2), (1, 3), (1, 4), (1, 5);
 
 -- Admin (role_id = 2): 사용자 조회 권한만 부여 (perm_id=3)
 INSERT INTO `role_permissions` (`role_id`, `perm_id`) VALUES
@@ -82,11 +83,11 @@ INSERT INTO `menus` (`menu_id`, `parent_id`, `title`, `url`, `icon_name`, `menu_
 INSERT INTO `menus` (`menu_id`, `parent_id`, `title`, `url`, `icon_name`, `menu_order`, `type`) VALUES
 (3, 1, '프로젝트 목록', '/app/projects', 'FolderGit2', 2, 'GLOBAL');
 
--- ID 11: 프로젝트 목록 서브 메뉴: 진행 중인 프로젝트 (parent_id: 3, type: GLOBAL) - 신규 추가
+-- ID 11: 프로젝트 목록 서브 메뉴: 진행 중인 프로젝트 (parent_id: 3, type: GLOBAL)
 INSERT INTO `menus` (`menu_id`, `parent_id`, `title`, `url`, `icon_name`, `menu_order`, `type`) VALUES
 (11, 3, '진행 중인 프로젝트', '/app/projects/in-progress', 'Clock', 1, 'GLOBAL');
 
--- ID 12: 프로젝트 목록 서브 메뉴: 종료된 프로젝트 (parent_id: 3, type: GLOBAL) - 신규 추가
+-- ID 12: 프로젝트 목록 서브 메뉴: 종료된 프로젝트 (parent_id: 3, type: GLOBAL)
 INSERT INTO `menus` (`menu_id`, `parent_id`, `title`, `url`, `icon_name`, `menu_order`, `type`) VALUES
 (12, 3, '종료된 프로젝트', '/app/projects/closed', 'Archive', 2, 'GLOBAL');
 
@@ -101,6 +102,10 @@ INSERT INTO `menus` (`menu_id`, `parent_id`, `title`, `url`, `icon_name`, `menu_
 -- ID 6: 관리자 그룹 서브 메뉴: 역할/권한 관리 (parent_id: 4, type: GLOBAL)
 INSERT INTO `menus` (`menu_id`, `parent_id`, `title`, `url`, `icon_name`, `menu_order`, `type`) VALUES
 (6, 4, '역할/권한 관리', '/app/admin/roles', 'ShieldCheck', 2, 'GLOBAL');
+
+-- ID 13: 관리자 그룹 서브 메뉴: 메뉴 관리 (parent_id: 4, type: GLOBAL)
+INSERT INTO `menus` (`menu_id`, `parent_id`, `title`, `url`, `icon_name`, `menu_order`, `type`) VALUES
+(13, 4, '메뉴 관리', '/app/admin/menu', 'ListTree', 3, 'GLOBAL');
 
 -- ID 7: 프로젝트 그룹 메뉴: 프로젝트 메뉴 (parent_id: NULL, type: PROJECT -> GLOBAL 요청)
 INSERT INTO `menus` (`menu_id`, `parent_id`, `title`, `url`, `icon_name`, `menu_order`, `type`) VALUES
@@ -154,6 +159,9 @@ INSERT INTO `menu_permissions` (`menu_id`, `perm_type`, `perm_ref_id`) VALUES
 INSERT INTO `menu_permissions` (`menu_id`, `perm_type`, `perm_ref_id`) VALUES
 (10, 'GLOBAL', 1); -- 설정 및 멤버 관리
 
+-- menu:manage 권한
+INSERT INTO `menu_permissions` (`menu_id`, `perm_type`, `perm_ref_id`) VALUES
+(13, 'GLOBAL', 5);
 
 -- #################################################
 -- ## 4. 테스트 사용자 데이터 삽입
