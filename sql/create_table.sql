@@ -19,7 +19,6 @@ DROP TABLE IF EXISTS `menus`;
 DROP TABLE IF EXISTS `menu_permissions`;
 
 SET FOREIGN_KEY_CHECKS = 1;
-SET FOREIGN_KEY_CHECKS = 1;
 
 -- 사용자 테이블
 CREATE TABLE `users` (

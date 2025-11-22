@@ -27,6 +27,7 @@ export const authService = {
     const jwtToken = jwtProvider.signAccessToken(app, {
       githubId: Number(githubUser.id),
       role: user.role,
+      permissions: user.permissions,
     });
 
     // refreshToken 생성
@@ -63,6 +64,7 @@ export const authService = {
     const newAccessToken = jwtProvider.signAccessToken(app, {
       githubId: Number(githubId),
       role: user.role,
+      permissions: user.permissions, 
     });
 
     reply.setCookie("access_token", newAccessToken, {

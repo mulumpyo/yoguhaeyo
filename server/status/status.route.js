@@ -1,10 +1,10 @@
 import { statusController } from "./status.controller.js";
 import { verifyToken } from "../common/middlewares/auth.js";
-import { checkRole } from "../common/middlewares/checkRole.js";
+import { checkGlobalPermission } from "../common/middlewares/checkGlobalPermission.js";
 
 // Route 공통
-const createRouteOptions = ({ summary, description, response, roles = ["super"] }) => ({
-  preHandler: [verifyToken, checkRole(roles)],
+const createRouteOptions = ({ summary, description, response, permission = "system:monitor" }) => ({
+  preHandler: [verifyToken, checkGlobalPermission(permission)],
   schema: {
     tags: ["상태"],
     summary,

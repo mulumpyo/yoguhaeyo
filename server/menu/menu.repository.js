@@ -7,7 +7,7 @@ export const menuRepository = {
      * @returns {Promise<Array<Object>>} 필터링된 메뉴 목록 (플랫 리스트)
      */
     async getFilteredMenusByProcedure(app, githubId) {
-        console.log(githubId);
+
         const procSql = `CALL proc_filtered_menu_tree(?)`;
         
         const [results] = await app.mysql.pool.query(procSql, [githubId]);
