@@ -4,6 +4,7 @@ import { githubProvider } from "../common/providers/github.provider.js";
 import { jwtProvider } from "../common/providers/jwt.provider.js";
 import { refreshTokenProvider } from "../common/providers/refreshToken.provider.js";
 import { cookieProvider } from "../common/providers/cookie.provider.js";
+import { redisProvider } from "../common/providers/redis.provider.js";
 
 export const authService = {
 
@@ -14,57 +15,74 @@ export const authService = {
   loginWithGitHub: async (app, req, reply) => {
     const isProd = process.env.NODE_ENV === "production";
 
-    // GitHub 인증
+    // 1. GitHub 인증
     const accessToken = await githubProvider.getAccessToken(app, req);
     const githubUser = await githubProvider.getUserInfo(accessToken);
 
-    // DB upsert
+    // 2. DB Upsert (사용자 정보 저장/업데이트)
     await authRepository.upsertUserAndAssignRole(app, githubUser);
+    
+    // 3. 최신 사용자 정보 조회
     const user = await authMapper.selectUserByGithubId(app, githubUser.id);
     if (!user) throw { status: 401, message: "User not found after upsert" };
 
-    // accseeToken 토큰 생성
+    // 4. [Cache Warm-up] 로그인 직후 Redis에 최신 정보 캐싱
+    await redisProvider.setAuthUser(app, githubUser.id, user);
+
+    // 5. AccessToken 생성
     const jwtToken = jwtProvider.signAccessToken(app, {
       githubId: Number(githubUser.id),
-      role: user.role,
-      permissions: user.permissions,
     });
 
-    // refreshToken 생성
+    // 6. RefreshToken 생성 및 저장
     const refreshToken = refreshTokenProvider.generate();
     await refreshTokenProvider.save(app, refreshToken, githubUser.id);
 
-    // 쿠키 저장
+    // 7. 쿠키 설정
     cookieProvider.setAuthCookies(reply, jwtToken, refreshToken, isProd);
   },
 
   /**
    * GithubId 값으로 유저 정보 조회
-   * @returns {object} { user: { githubId, username, avatar, role }} }
-   * @throws {object} {status, message} 오류 발생 시
+   * (서비스 내부 호출용 or /me API용)
+   * @returns {object} user 객체
    */
   getUserByGithubId: async (app, githubId) => {
-    return await authMapper.selectUserByGithubId(app, githubId)
+    // 1. Redis 먼저 확인
+    let user = await redisProvider.getAuthUser(app, githubId);
+    
+    // 2. 없으면 DB 확인
+    if (!user) {
+        user = await authMapper.selectUserByGithubId(app, githubId);
+        if (user) {
+            await redisProvider.setAuthUser(app, githubId, user);
+        }
+    }
+    
+    return user;
   },
 
   /**
    * refreshToken으로 accessToken 재발급
    * @returns {object} { message: "Token refreshed" }
-   * @throws {object} {status, message} 오류 발생 시
    */
   refreshAccessToken: async (app, refreshToken, reply) => {
     const isProd = process.env.NODE_ENV === "production";
 
+    // 1. Refresh Token 검증
     const githubId = await refreshTokenProvider.get(app, refreshToken);
     if (!githubId) throw { status: 401, message: "Invalid refresh token" };
 
-    const user = (await authMapper.selectUserByGithubId(app, githubId));
+    // 2. 유저 유효성 재확인 (DB 조회)
+    const user = await authMapper.selectUserByGithubId(app, githubId);
     if (!user) throw { status: 404, message: "User not found or disabled" };
 
+    // 3. 재발급 시점의 최신 권한을 Redis에 업데이트
+    await redisProvider.setAuthUser(app, githubId, user);
+
+    // 4. 새 AccessToken 발급
     const newAccessToken = jwtProvider.signAccessToken(app, {
       githubId: Number(githubId),
-      role: user.role,
-      permissions: user.permissions, 
     });
 
     reply.setCookie("access_token", newAccessToken, {
@@ -79,10 +97,14 @@ export const authService = {
   },
 
   /**
-   * refreshToken 무효화
-   * @throws {object} {status, message} 오류 발생 시
+   * refreshToken 무효화 (로그아웃)
    */
-  invalidateRefreshToken: (app, refreshToken) => {
+  invalidateRefreshToken: async (app, refreshToken) => {
+    
+    const githubId = await refreshTokenProvider.get(app, refreshToken);
+    if (githubId) {
+        await redisProvider.delAuthUser(app, githubId);
+    }
     return refreshTokenProvider.delete(app, refreshToken);
   }
 
