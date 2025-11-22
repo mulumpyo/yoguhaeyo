@@ -1,10 +1,37 @@
+import { authMapper } from "../../auth/auth.mapper.js";
+import { redisProvider } from "../providers/redis.provider.js";
+
 export const checkGlobalPermission = (requiredPerm) => async (req, reply) => {
   
-  const user = req.user || {};
-  const userRoles = user.role || [];
-  const userPerms = user.permissions || [];
+  const jwtUser = req.user; 
+  
+  if (!jwtUser || !jwtUser.githubId) {
+     return reply.code(401).send({ error: "Unauthorized", message: "로그인 정보가 유효하지 않습니다." });
+  }
 
-  if (userRoles.includes('super')) {
+  let freshUser = await redisProvider.getAuthUser(req.server, jwtUser.githubId);
+
+  if (!freshUser) {
+    try {
+      freshUser = await authMapper.selectUserByGithubId(req.server, jwtUser.githubId);
+      
+      if (freshUser) {
+        await redisProvider.setAuthUser(req.server, jwtUser.githubId, freshUser);
+      }
+    } catch (err) {
+      req.log.error(err);
+    }
+  }
+
+  if (!freshUser) {
+    return reply.code(401).send({ error: "Unauthorized", message: "존재하지 않는 사용자입니다." });
+  }
+
+  const userRoles = freshUser.role || "";
+  const userPerms = freshUser.permissions || [];
+
+  if (userRoles === 'super' || (Array.isArray(userRoles) && userRoles.includes('super'))) {
+    req.user = freshUser;
     return; 
   }
 
@@ -16,5 +43,6 @@ export const checkGlobalPermission = (requiredPerm) => async (req, reply) => {
       message: `이 작업을 수행하기 위한 권한(${requiredPerm})이 부족합니다.`,
     });
   }
-
+  
+  req.user = freshUser;
 };
