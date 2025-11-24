@@ -18,7 +18,7 @@ export const verifyToken = async (req, reply) => {
 
     if (!user.isActive) {
        reply.clearCookie('access_token');
-       return reply.code(403).send({ message: "관리자에 의해 정지된 계정입니다." });
+       return reply.code(403).send({ message: "관리자에 의해 비활성화된 계정입니다." });
     }
 
     req.user = {

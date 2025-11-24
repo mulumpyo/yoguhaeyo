@@ -30,7 +30,7 @@ export const checkGlobalPermission = (requiredPerm) => async (req, reply) => {
   if (!freshUser.isActive) {
       return reply.code(403).send({ 
         error: "Forbidden", 
-        message: "관리자에 의해 정지된 계정입니다." 
+        message: "관리자에 의해 비활성화된 계정입니다." 
       });
   }
 
