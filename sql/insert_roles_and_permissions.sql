@@ -12,10 +12,10 @@ INSERT INTO `permissions` (`name`, `description`) VALUES
 ('system:monitor',   'DB 및 Redis 상태 확인 권한');
 
 -- 1-2. 전역 역할 (Roles)
-INSERT INTO `roles` (`name`, `description`) VALUES
-('super', '시스템 최고 관리자: 모든 역할 및 권한 관리'),
-('admin', '관리자: 사용자 계정 및 시스템 모니터링'),
-('user',  '사용자: 로그인 및 프로젝트 생성 권한');
+INSERT INTO `roles` (`name`, `priority`, `description`) VALUES
+('super', 0, '시스템 최고 관리자: 모든 역할 및 권한 관리'),
+('admin', 1, '관리자: 사용자 계정 및 시스템 모니터링'),
+('user',  2, '사용자: 로그인 및 프로젝트 생성 권한');
 
 -- 1-3. 프로젝트 역할 (Project Roles)
 INSERT INTO `project_roles` (`name`, `description`) VALUES

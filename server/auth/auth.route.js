@@ -17,46 +17,49 @@ const authRoutes = async (app) => {
   app.get(
     "/callback",
     createRouteOptions({
-      summary: "GitHub Oauth 로그인",
-      description: "로그인에 성공할 경우 리다이텍트하는 콜백 함수입니다.",
+      summary: "GitHub Oauth 로그인 콜백",
+      description: "GitHub 인증 성공 후 호출되며, 사용자 정보를 저장하고 토큰을 발급합니다.",
       response: {
-        302: { description: "로그인 성공 후 리다이렉트" },
+        302: { description: "로그인 성공 후 메인으로 리다이렉트" },
         400: {
-          description: "Authorization Code 누락",
+          description: "잘못된 요청 (Authorization Code 누락 등)",
           type: "object",
           properties: { error: { type: "string", example: "Authorization code missing" } }
         },
         401: {
-          description: "토큰 발급 실패",
+          description: "인증 실패 (사용자 정보 없음)",
           type: "object",
           properties: { error: { type: "string", example: "User not found after upsert" } }
         },
+        403: {
+          description: "비활성화(정지)된 사용자",
+          type: "object",
+          properties: { 
+            message: { type: "string", example: "관리자에 의해 정지된 계정입니다." },
+            error: { type: "string" } 
+          }
+        },
         500: {
-          description: "서버 인증 실패",
+          description: "서버 내부 오류",
           type: "object",
           properties: { error: { type: "string", example: "Authentication failed" } }
-        }, 
-        502: {
-          description: "GitHub API 오류",
-          type: "object",
-          properties: { error: { type: "string", example: "GitHub API error" } }
         },
       },
     }),
     (request, reply) => authController.githubLoginCallback(app, request, reply)
   );
 
-  // Login 상태
+  // 로그인 상태 확인
   app.get(
     "/me",
     {
       preHandler: verifyToken,
       ...createRouteOptions({
-        summary: "로그인 상태 확인",
-        description: "로그인을 한 경우 사용자의 정보를 반환합니다.",
+        summary: "로그인 사용자 정보 조회",
+        description: "현재 로그인된 사용자의 상세 정보와 권한 목록을 반환합니다.",
         response: {
           200: {
-            description: "로그인 사용자 정보",
+            description: "성공",
             type: "object",
             properties: {
               user: {
@@ -64,14 +67,26 @@ const authRoutes = async (app) => {
                 properties: {
                   githubId: { type: "number", example: 123456 },
                   username: { type: "string", example: "octocat" },
-                  avatar: { type: "string", example: "https://github.com/images/avatar.png" },
-                  role: { type: "string", example: "user" }
+                  avatar: { type: "string", example: "https://avatars.githubusercontent.com/..." },
+                  isActive: { type: "boolean", example: true },
+                  
+                  role: { 
+                    type: "array", 
+                    items: { type: "string" },
+                    example: ["user", "admin"]
+                  },
+                  
+                  permissions: {
+                    type: "array",
+                    items: { type: "string" },
+                    example: ["user:read", "project:create"]
+                  }
                 },
               },
             },
           },
           401: {
-            description: "로그인하지 않은 상태",
+            description: "토큰이 없거나 유효하지 않음",
             type: "object",
             properties: { error: { type: "string", example: "Unauthorized" } },
           },
@@ -80,40 +95,42 @@ const authRoutes = async (app) => {
             type: "object",
             properties: { error: { type: "string", example: "User not found" } },
           },
-          500: {
-            description: "서버 오류",
-            type: "object",
-            properties: { error: { type: "string" , example: "Failed to verify login" } },
-          },
         },
       }),
     },
     (request, reply) => authController.getLoginUser(app, request, reply)
   );
 
-  // Refresh Token 사용하여 Access Token 재발급
+  // 토큰 갱신
   app.post(
     "/refresh",
     createRouteOptions({
       summary: "Access Token 재발급",
-      description: "Refresh Token을 사용하여 Access Token을 재발급합니다.",
+      description: "HttpOnly 쿠키에 담긴 Refresh Token을 사용하여 Access Token을 재발급합니다.",
       response: {
         200: {
-          description: "Access Token 재발급 완료",
+          description: "재발급 성공",
           type: "object",
           properties: {
             message: { type: "string", example: "Token refreshed" },
           },
         },
         401: {
-          description: "Refresh Token 유효하지 않음",
+          description: "유효하지 않은 Refresh Token",
           type: "object",
           properties: { error: { type: "string", example: "Invalid refresh token" } },
         },
-        404: {
-          description: "사용자를 찾을 수 없거나 비활성화됨",
+        403: {
+          description: "계정 정지로 인한 재발급 거부",
           type: "object",
-          properties: { error: { type: "string", example: "Refresh token not found" } },
+          properties: { 
+            message: { type: "string", example: "계정이 정지되어 로그아웃됩니다." } 
+          }
+        },
+        404: {
+          description: "사용자 정보 없음",
+          type: "object",
+          properties: { error: { type: "string", example: "User not found" } },
         },
       },
     }),
@@ -125,7 +142,7 @@ const authRoutes = async (app) => {
     "/logout",
     createRouteOptions({
       summary: "로그아웃",
-      description: "모든 인증 쿠키 삭제 및 Refresh Token 무효화",
+      description: "서버의 Refresh Token을 무효화하고 클라이언트 쿠키를 삭제합니다.",
       response: {
         200: {
           description: "로그아웃 성공",

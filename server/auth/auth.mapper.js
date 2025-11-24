@@ -16,6 +16,7 @@ export const authMapper = {
       githubId: userRow.github_id,
       username: userRow.username,
       avatar: userRow.avatar,
+      isActive: !!userRow.is_active,
       role: userRow.roles_str 
         ? userRow.roles_str.split(',') 
         : [],

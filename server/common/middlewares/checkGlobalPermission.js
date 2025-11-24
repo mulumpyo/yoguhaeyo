@@ -27,10 +27,17 @@ export const checkGlobalPermission = (requiredPerm) => async (req, reply) => {
     return reply.code(401).send({ error: "Unauthorized", message: "존재하지 않는 사용자입니다." });
   }
 
-  const userRoles = freshUser.role || "";
+  if (!freshUser.isActive) {
+      return reply.code(403).send({ 
+        error: "Forbidden", 
+        message: "관리자에 의해 정지된 계정입니다." 
+      });
+  }
+
+  const userRoles = freshUser.role || [];
   const userPerms = freshUser.permissions || [];
 
-  if (userRoles === 'super' || (Array.isArray(userRoles) && userRoles.includes('super'))) {
+  if (userRoles.includes('super')) {
     req.user = freshUser;
     return; 
   }

@@ -13,6 +13,7 @@ export const authRepository = {
         u.github_id,
         u.username,
         u.avatar,
+        u.is_active,
         GROUP_CONCAT(DISTINCT r.name) AS roles_str,
         GROUP_CONCAT(DISTINCT p.name) AS perms_str
       FROM users u

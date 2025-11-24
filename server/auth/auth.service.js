@@ -26,6 +26,10 @@ export const authService = {
     const user = await authMapper.selectUserByGithubId(app, githubUser.id);
     if (!user) throw { status: 401, message: "User not found after upsert" };
 
+    if (!user.isActive) {
+      throw { status: 403, message: "비활성화된 계정입니다." };
+    }
+
     // 4. [Cache Warm-up] 로그인 직후 Redis에 최신 정보 캐싱
     await redisProvider.setAuthUser(app, githubUser.id, user);
 
@@ -76,6 +80,12 @@ export const authService = {
     // 2. 유저 유효성 재확인 (DB 조회)
     const user = await authMapper.selectUserByGithubId(app, githubId);
     if (!user) throw { status: 404, message: "User not found or disabled" };
+
+    if (!user.isActive) {
+      await refreshTokenProvider.delete(app, refreshToken);
+      await redisProvider.delAuthUser(app, githubId);
+      throw { status: 403, message: "계정이 비활성화되었습니다." };
+    }
 
     // 3. 재발급 시점의 최신 권한을 Redis에 업데이트
     await redisProvider.setAuthUser(app, githubId, user);
