@@ -27,6 +27,11 @@ export const config = [
     },
   },
   {
-    ignores: ["dist/**"],
+    ignores: [
+      "dist/**", 
+      ".nuxt/**",
+      ".output/**",
+      "node_modules/**"
+    ],
   },
 ];
