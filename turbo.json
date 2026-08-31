@@ -1,21 +1,26 @@
 {
   "$schema": "https://turborepo.org/schema.json",
   "ui": "tui",
+  "globalEnv": [
+    "API_PORT",
+    "NUXT_PORT",
+    "NUXT_PUBLIC_API_BASE",
+    "NUXT_API_PROXY_TARGET"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [
-        ".nuxt/**", 
-        ".output/**", 
-        "dist/**"
-      ]
-    },
-    "lint": {
-      "dependsOn": ["^lint"]
+      "outputs": [".nuxt/**", ".output/**", "dist/**"]
     },
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "test:e2e": {
+      "dependsOn": ["^build"]
     }
   }
 }
